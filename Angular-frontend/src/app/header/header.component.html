@@ -1,1 +1,14 @@
-<p>header works!</p>
+<header>
+    <div class="container header-container">
+      <a routerLink="/" class="logo">Book<span>Verse</span></a>
+      <nav>
+        <ul>
+            @for (item of navItems; track item.label) {
+                <li><a [routerLink]="item.path">{{ item.label }}</a></li>
+            } @empty {
+                <li>There are no items.</li>
+            }
+        </ul>
+      </nav>
+    </div>
+  </header>

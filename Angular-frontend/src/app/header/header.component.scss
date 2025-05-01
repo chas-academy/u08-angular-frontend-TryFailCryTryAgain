@@ -1,0 +1,13 @@
+header {
+    height: 50px;
+    width: 100vw;
+    background-color: green;
+    color: white;
+    display: flex;
+
+    div {
+        justify-content: flex-start;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+}
