@@ -11,11 +11,9 @@ import { RouterLink } from '@angular/router';
 export class HeaderComponent {
   // Navigation items could be managed here
   navItems = [
-    { path: '/', label: 'Home' },
     { path: '/genres', label: 'Genres' },
     { path: '/authors', label: 'Authors' },
-    { path: '/login', label: 'Login' },
     { path: '/contact', label: 'Contact' },
-    { path: '/steve', label: 'Steve'}
+    { path: '/login', label: 'Login' },
   ];
 }
