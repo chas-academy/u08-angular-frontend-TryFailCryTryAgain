@@ -1,8 +1,21 @@
-@import '../variables.scss';
+@use '../var.scss';
 
-footer {
-    margin-top: auto;
-    width: 100vw;
-    background-color: $dark_blue;
+:host {
+    display: block;
+  }
+  
+  footer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background-color: var.$dark_blue;
     height: 50px;
-}
+    color: var.$white;
+  
+    span {
+      justify-content: flex-start;
+      margin: 0 20px;
+      font-style: italic;
+      font-weight: 600;
+    }
+  }

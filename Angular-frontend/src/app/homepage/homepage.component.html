@@ -1,0 +1,26 @@
+<main class="wrapper">
+    <section class="upper_section">
+        <h2>Welcome to BOOK STORE TITLE</h2>
+        <h4>Discover your next favorit book from our vast collection</h4>
+        <div class="dropdown" [class.active]="isShopDropdownOpen">
+            <button (click)="toggleShopDropdown()">Browse Books</button> <!-- Same functionallity as the header "books" -->
+            <div class="dropdown-content" If="isShopDropdownOpen">
+                @for (ShopDrop of ShopDropDown; track $index) {
+                <a (click)="closeShopDropdown()" [routerLink]="ShopDrop.link">{{ ShopDrop.label }}</a>
+                }
+            </div>
+        </div>
+    </section>
+    <br />
+    <section class="lower_section">
+        <h2>Featured Books</h2>
+        <div class="book_container">
+            @for (Book of Books; track $index) {
+                <button class="book_card" [routerLink]="Book.link">
+                    <h3>{{ Book.title }}</h3>
+                    <h4>€ {{ Book.price }}</h4>
+                </button>
+            }
+        </div>
+    </section>
+</main>
