@@ -15,8 +15,8 @@
     <section class="lower_section">
         <h2>Featured Books</h2>
         <div class="book_container">
-            @for (Book of Books; track $index) {
-                <button class="book_card" [routerLink]="Book.link">
+            @for (Book of displayedBooks; track $index) {
+                <button class="book_card" [routerLink]="Book._id">
                     <h3>{{ Book.title }}</h3>
                     <h4>€ {{ Book.price }}</h4>
                 </button>

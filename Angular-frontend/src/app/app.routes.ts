@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { NewPageComponent } from './new-page/new-page.component';
 import { LayoutComponent } from './layout.component';
-import { Page2Component } from './page2/page2.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { ContactComponent } from './contact/contact.component';
 import { SelectedGenreComponent } from './selected-genre/selected-genre.component';
@@ -12,6 +11,13 @@ import { CheckoutComponent } from './checkout/checkout.component';
 // Localhost:4200/contact
 
 export const routes: Routes = [
+    {
+        path: 'test',
+        component: LayoutComponent,
+        children: [
+            { path: '', component: NewPageComponent },
+        ],
+    },
     {
         path: 'checkout',
         component: LayoutComponent,
@@ -56,13 +62,6 @@ export const routes: Routes = [
         component: LayoutComponent,
         children: [
             { path: '', component: NewPageComponent },
-        ],
-    },
-    {
-        path: 'page2',
-        component: LayoutComponent,
-        children: [
-            { path: '', component: Page2Component },
         ],
     },
 ];
