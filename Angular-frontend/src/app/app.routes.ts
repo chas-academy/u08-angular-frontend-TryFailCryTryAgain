@@ -5,11 +5,19 @@ import { Page2Component } from './page2/page2.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { ContactComponent } from './contact/contact.component';
 import { SelectedGenreComponent } from './selected-genre/selected-genre.component';
+import { SelectedBookComponent } from './selected-book/selected-book.component';
 
 
 // Localhost:4200/contact
 
 export const routes: Routes = [
+    {
+        path: 'book/book_id',
+        component: LayoutComponent,
+        children: [
+            { path: '', component: SelectedBookComponent },
+        ],
+    },
     {
         path: 'book/fiction',
         component: LayoutComponent,

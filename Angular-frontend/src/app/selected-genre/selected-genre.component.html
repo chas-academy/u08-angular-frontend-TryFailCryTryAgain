@@ -6,10 +6,10 @@
     <div class="divider"></div>
     <section class="book_wrapper">
         @for (selectedBook of selectedBooks; track $index) {
-            <div class="book_card" [routerLink]="selectedBook.link">
-                <h2>{{ selectedBook.title }}</h2>
-                <h3>By {{ selectedBook.author }}</h3>
-                <h4>€ {{ selectedBook.price }}</h4>
+            <div class="book_card">
+                <a [routerLink]="['/book', selectedBook.id]"><h2>{{ selectedBook.title }}</h2></a>
+                <a [routerLink]="['/book', selectedBook.id]"><h3>By {{ selectedBook.author }}</h3></a>
+                <a [routerLink]="['/book', selectedBook.id]"><h4>€ {{ selectedBook.price }}</h4></a>
                 <button (click)="addToCart($event)">Add to Cart</button>
             </div>
         }

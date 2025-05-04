@@ -11,21 +11,21 @@ export class SelectedGenreComponent {
 
 
   selectedBooks = [
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
-    { title: 'Book Title', link: 'book/book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
+    { title: 'Book Title', id: 'book_id', price: '12.23', author: 'author' },
   ]
 
   addToCart(e: Event): void { // Selected Book: Book

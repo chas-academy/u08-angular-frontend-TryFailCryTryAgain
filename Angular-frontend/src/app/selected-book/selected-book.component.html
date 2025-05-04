@@ -1,0 +1,26 @@
+<div class="book-container">
+    <div class="book-card">
+      <div class="book-header">
+        <h1 class="book-title">{{ selectedBook.title }}</h1>
+        <span class="book-id">ID: {{ selectedBook.id }}</span>
+      </div>
+      
+      <div class="book-details">
+        <div class="book-info">
+          <p class="book-author">Author: {{ selectedBook.author }}</p>
+          <p class="book-genre">Genre: {{ selectedBook.genre }}</p>
+          <p class="book-description">{{ selectedBook.description }}</p>
+        </div>
+        
+        <div class="book-meta">
+          <div class="price-stock">
+            <span class="book-price">${{ selectedBook.price }}</span>
+            <span class="book-stock" [class.low-stock]="isLowStock()">
+              {{ selectedBook.stock }} in stock
+            </span>
+          </div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
