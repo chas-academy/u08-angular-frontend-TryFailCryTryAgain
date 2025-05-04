@@ -1,0 +1,95 @@
+<div class="checkout-container">
+    <h2>Checkout</h2>
+
+    <div class="checkout-content">
+        <div class="order-summary">
+        <h3>Your Order</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Book ID</th>
+                <th>Title</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of cartItems">
+                <td>{{ item.id }}</td>
+                <td>{{ item.title }}</td>
+                <td>
+                    <div class="quantity-controls">
+                      <button (click)="updateQuantity(item, -1)">-</button>
+                      <span>{{ item.quantity }}</span>
+                      <button (click)="updateQuantity(item, 1)">+</button>
+                    </div>
+                  </td>
+                <td>${{ item.price.toFixed(2) }}</td>
+                <td>${{ getItemTotal(item).toFixed(2) }}</td>
+                <td>
+                <button (click)="removeItem(item.id)">Remove</button>
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="4" class="total-label">Total:</td>
+                <td colspan="2" class="total-value">${{ totalPrice.toFixed(2) }}</td>
+            </tr>
+            </tfoot>
+        </table>
+        </div>
+
+        <div class="customer-info">
+            <h3>Customer Information</h3>
+            <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" formControlName="name">
+                <div *ngIf="checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched" class="error">
+                    Please enter a valid name (min 3 characters)
+                </div>
+                </div>
+
+                <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" formControlName="email">
+                <div *ngIf="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched" class="error">
+                    Please enter a valid email
+                </div>
+                </div>
+
+                <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" formControlName="phone">
+                <div *ngIf="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched" class="error">
+                    Please enter a valid phone number (10-15 digits)
+                </div>
+                </div>
+
+                <div class="form-group">
+                <label for="address">Shipping Address</label>
+                <textarea id="address" formControlName="address"></textarea>
+                <div *ngIf="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched" class="error">
+                    Please enter a complete address
+                </div>
+                </div>
+
+                <div class="form-group">
+                <label>Payment Method</label>
+                <select formControlName="paymentMethod">
+                    <option value="credit-card">Credit Card</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="bank-transfer">Bank Transfer</option>
+                </select>
+                </div>
+
+                <button type="submit" [disabled]="checkoutForm.invalid || cartItems.length === 0" class="submit-btn">
+                Place Order
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

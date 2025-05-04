@@ -6,11 +6,19 @@ import { HomepageComponent } from './homepage/homepage.component';
 import { ContactComponent } from './contact/contact.component';
 import { SelectedGenreComponent } from './selected-genre/selected-genre.component';
 import { SelectedBookComponent } from './selected-book/selected-book.component';
+import { CheckoutComponent } from './checkout/checkout.component';
 
 
 // Localhost:4200/contact
 
 export const routes: Routes = [
+    {
+        path: 'checkout',
+        component: LayoutComponent,
+        children: [
+            { path: '', component: CheckoutComponent },
+        ],
+    },
     {
         path: 'book/book_id',
         component: LayoutComponent,

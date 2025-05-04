@@ -1,6 +1,6 @@
 // header.component.ts
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,6 +10,8 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+
+  constructor(private router: Router) {}
 
   // Will later be drawn from the API call, currently static data into a dynamic layout
   ShopDropDown = [
@@ -123,6 +125,7 @@ export class HeaderComponent {
   checkout() {
     // Implement your checkout logic
     console.log('Proceeding to checkout', this.cartItems);
+    this.router.navigate(['/checkout']);
     // You might want to navigate to a checkout page
     // this.router.navigate(['/checkout']);
   }
