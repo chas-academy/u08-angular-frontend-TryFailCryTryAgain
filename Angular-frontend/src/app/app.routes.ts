@@ -3,11 +3,22 @@ import { NewPageComponent } from './new-page/new-page.component';
 import { LayoutComponent } from './layout.component';
 import { Page2Component } from './page2/page2.component';
 import { HomepageComponent } from './homepage/homepage.component';
+import { ContactComponent } from './contact/contact.component';
+
+
+// Localhost:4200/contact
 
 export const routes: Routes = [
     {
-        path: 'gay',
-        component: HomepageComponent,
+        path: 'contact2',
+        component: ContactComponent,
+    },
+    {
+        path: 'contact',
+        component: LayoutComponent,
+        children: [
+            { path: '', component: ContactComponent },
+        ],
     },
     {
         path: '',
@@ -31,7 +42,3 @@ export const routes: Routes = [
         ],
     },
 ];
-
-
-
-// { path: 'new-page', component: NewPageComponent },
