@@ -15,8 +15,55 @@
         </li>
         <li><a routerLink="/contact">Contact</a></li>
         <li></li>
-        <a class="user-icon"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a class="user-icon" (click)="toggleCart()">
+          <i class="fa-solid fa-cart-shopping"></i>
+          @if (cartItems.length > 0) {
+            <span class="cart-badge">{{ cartItems.length }}</span>
+          }
+        </a>
       </ul>
     </nav>
   </div>
 </header>
+
+
+
+<aside class="cart-sidebar" [class.active]="isCartOpen">
+  <div class="cart-header">
+    <h3>Your Cart</h3>
+    <button (click)="closeCart()" class="close-btn">&times;</button>
+  </div>
+  
+  <div class="cart-items">
+    @if (cartItems.length === 0) {
+      <p class="empty-cart">Your cart is empty</p>
+    }
+    @for (item of cartItems; track item.id) {
+      <div class="cart-item">
+        <span class="item-title"> {{ item.title }}</span>
+        <div class="item-controls">
+          <button (click)="decreaseQuantity(item.id)">-</button>
+          <span class="item-quantity"> {{ item.quantity }} </span>
+          <button (click)="increaseQuantity(item.id)">+</button>
+          <button (click)="removeItem(item.id)" class="remove-btn">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <span class="item-price">{{ item.price * item.quantity | currency }}</span>
+      </div>
+    }
+  </div>
+  
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Total:</span>
+      <span>{{ totalPrice | currency }}</span>
+    </div>
+    <div class="cart-actions">
+      <button (click)="clearCart()" class="clear-btn">Clear Cart</button>
+      <button (click)="checkout()" class="checkout-btn">Go to Checkout</button>
+    </div>
+  </div>
+</aside>
+
+<div class="overlay" [class.active]="isCartOpen" (click)="closeCart()"></div>
