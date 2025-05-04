@@ -4,11 +4,19 @@ import { LayoutComponent } from './layout.component';
 import { Page2Component } from './page2/page2.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { ContactComponent } from './contact/contact.component';
+import { SelectedGenreComponent } from './selected-genre/selected-genre.component';
 
 
 // Localhost:4200/contact
 
 export const routes: Routes = [
+    {
+        path: 'book/fiction',
+        component: LayoutComponent,
+        children: [
+            { path: '', component: SelectedGenreComponent },
+        ],
+    },
     {
         path: 'contact2',
         component: ContactComponent,

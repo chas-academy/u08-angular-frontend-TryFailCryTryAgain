@@ -12,13 +12,13 @@ export class HeaderComponent {
 
   // Will later be drawn from the API call, currently static data into a dynamic layout
   ShopDropDown = [
-    { label: 'Fiction', link: '/shop/fiction' },
-    { label: 'Non-Fiction', link: '/shop/non-fiction' },
-    { label: 'Mystery & Thriller', link: '/shop/mystery-thriller' },
-    { label: 'Science Fiction', link: '/shop/science-fiction' },
-    { label: 'Romance', link: '/shop/romance' },
-    { label: 'Biographies', link: '/shop/biographies' },
-    { label: 'New Genre', link: '/shop/new-genre' },
+    { label: 'Fiction', link: '/book/fiction' },
+    { label: 'Non-Fiction', link: '/book/non-fiction' },
+    { label: 'Mystery & Thriller', link: '/book/mystery-thriller' },
+    { label: 'Science Fiction', link: '/book/science-fiction' },
+    { label: 'Romance', link: '/book/romance' },
+    { label: 'Biographies', link: '/book/biographies' },
+    { label: 'New Genre', link: '/book/new-genre' },
   ];
 
   isShopDropdownOpen = false;
