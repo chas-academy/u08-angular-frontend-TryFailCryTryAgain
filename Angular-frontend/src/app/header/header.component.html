@@ -9,9 +9,9 @@
           <a (click)="toggleShopDropdown()">Books <i class="fas fa-chevron-down"></i></a>
           <!-- Make this dynamic -->
           <div class="dropdown-content" If="isShopDropdownOpen">
-            @for (ShopDrop of ShopDropDown; track $index) {
-              <a (click)="closeShopDropdown()" [routerLink]="ShopDrop.link">{{ ShopDrop.label }}</a>
-            }
+            @for (bookGenre of bookGenres; track $index) {
+              <a (click)="closeShopDropdown()" [routerLink]="['/', bookGenre]" [queryParams]="{genre: bookGenre}">{{ bookGenre }}</a> <!-- routerLink]="bookGenre" -->
+              }
           </div>
         </li>
         <li><a routerLink="/contact">Contact</a></li>

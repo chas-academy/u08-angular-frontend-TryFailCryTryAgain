@@ -23,6 +23,8 @@ export class HomepageComponent {
 
   displayedBooks: BookModel[]= [];
 
+  bookGenres: any[]= [];
+
   constructor(private http: HttpClient) {
     this.getBooks();
   }
@@ -30,12 +32,11 @@ export class HomepageComponent {
   getBooks() {
     this.http.get<BookModel[]>('https://restful-api-sca9.onrender.com/book/').subscribe((res:any) => {
       this.displayedBooks = res.slice(0, 5);
+      this.bookGenres = [...new Set(res.map((book: BookModel) => book.genre))];
       console.log(res);
+      console.log(this.bookGenres);
     })
   }
-
-
-
 
     // Will later be drawn from the API call, currently static data into a dynamic layout
     ShopDropDown = [

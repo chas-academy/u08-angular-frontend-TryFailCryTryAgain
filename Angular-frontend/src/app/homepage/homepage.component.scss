@@ -103,6 +103,25 @@
       font-size: 1.5rem;
     }
 
+    .loading_container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+
+      .loading_circle {
+        width: 50px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        border: 8px solid lightblue;
+        border-right-color: var.$dark_blue;
+        animation: l2 1s infinite linear;
+      }
+
+      @keyframes l2 {to{transform: rotate(1turn)}}
+
+    }
+
     .book_container {
       display: flex;
       width: 100%;

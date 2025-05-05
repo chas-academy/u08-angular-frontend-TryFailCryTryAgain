@@ -19,4 +19,8 @@ export class Page2Component {
 
   }
 
+  getBooks() {
+    this.http.get("")
+  }
+
 }

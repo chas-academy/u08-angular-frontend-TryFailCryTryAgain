@@ -33,7 +33,7 @@ export const routes: Routes = [
         ],
     },
     {
-        path: 'book/fiction',
+        path: 'Fiction',
         component: LayoutComponent,
         children: [
             { path: '', component: SelectedGenreComponent },

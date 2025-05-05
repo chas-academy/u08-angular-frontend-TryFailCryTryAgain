@@ -5,22 +5,37 @@
         <div class="dropdown" [class.active]="isShopDropdownOpen">
             <button (click)="toggleShopDropdown()">Browse Books</button> <!-- Same functionallity as the header "books" -->
             <div class="dropdown-content" If="isShopDropdownOpen">
-                @for (ShopDrop of ShopDropDown; track $index) {
-                <a (click)="closeShopDropdown()" [routerLink]="ShopDrop.link">{{ ShopDrop.label }}</a>
+                @for (bookGenre of bookGenres; track $index) {
+                <a (click)="closeShopDropdown()" [routerLink]="bookGenre">{{ bookGenre }}</a> <!-- routerLink]="bookGenre" -->
                 }
             </div>
         </div>
     </section>
-    <br />
+    <br />  
     <section class="lower_section">
         <h2>Featured Books</h2>
+        <!-- (on viewport), defualt, (on timer(500ms)), on debugg mode-->
+        @defer (on timer(500ms)) {
         <div class="book_container">
-            @for (Book of displayedBooks; track $index) {
-                <button class="book_card" [routerLink]="Book._id">
-                    <h3>{{ Book.title }}</h3>
-                    <h4>€ {{ Book.price }}</h4>
+            @for (book of displayedBooks; track book._id) {
+                <button class="book_card" [routerLink]="book._id">
+                    <h3>{{ book.title }}</h3>
+                    <h4>€ {{ book.price }}</h4>
                 </button>
             }
         </div>
+        } @placeholder {
+            <div class="loading_container">
+                <p class="loading_circle"></p> <!-- Add animation to the loading data -->
+            </div>
+        } @loading {
+            <div class="loading_container">
+                <p class="loading_circle"></p> <!-- Add animation to the loading data -->
+            </div>
+        } @error {
+            <div class="loading_container">
+                <p>Failed to load Books. Please reload the page! </p>
+            </div>
+        }
     </section>
 </main>

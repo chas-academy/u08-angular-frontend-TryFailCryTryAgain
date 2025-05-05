@@ -2,6 +2,8 @@
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { BookModel } from '../book-model';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-header',
@@ -11,18 +13,20 @@ import { CommonModule } from '@angular/common';
 })
 export class HeaderComponent {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient) {
+    this.getBooks();
+  }
 
-  // Will later be drawn from the API call, currently static data into a dynamic layout
-  ShopDropDown = [
-    { label: 'Fiction', link: '/book/fiction' },
-    { label: 'Non-Fiction', link: '/book/non-fiction' },
-    { label: 'Mystery & Thriller', link: '/book/mystery-thriller' },
-    { label: 'Science Fiction', link: '/book/science-fiction' },
-    { label: 'Romance', link: '/book/romance' },
-    { label: 'Biographies', link: '/book/biographies' },
-    { label: 'New Genre', link: '/book/new-genre' },
-  ];
+  bookGenres: any[]= [];
+
+
+  getBooks() {
+      this.http.get<BookModel[]>('https://restful-api-sca9.onrender.com/book/').subscribe((res:any) => {
+        this.bookGenres = [...new Set(res.map((book: BookModel) => book.genre))];
+        console.log(res);
+        console.log(this.bookGenres);
+      })
+    }
 
   isShopDropdownOpen = false;
 
