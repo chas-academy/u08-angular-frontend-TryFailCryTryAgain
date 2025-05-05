@@ -10,7 +10,8 @@ import { CartItem } from '../cart-item';
   selector: 'app-header',
   imports: [RouterLink, CommonModule],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
+  standalone: true
 })
 export class HeaderComponent {
   cartItems: CartItem[] = [];
@@ -40,11 +41,7 @@ export class HeaderComponent {
   navigateToGenre(genre: string) {
     this.closeShopDropdown();
     this.router.navigate(['/Genre'], {
-      queryParams: { genre: genre },
-      queryParamsHandling: 'merge',
-      onSameUrlNavigation: 'reload'
-    }).then(() => {
-      window.location.reload();
+      queryParams: { genre }
     });
   }
 
@@ -94,8 +91,6 @@ export class HeaderComponent {
 
   checkout() {
     console.log('Proceeding to checkout', this.cartItems);
-    this.router.navigate(['/checkout'], {
-      state: { cartItems: this.cartItems }
-    });
+    this.router.navigate(['/checkout']);
   }
 }

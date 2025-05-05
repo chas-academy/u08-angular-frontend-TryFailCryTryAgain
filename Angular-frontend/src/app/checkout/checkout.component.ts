@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CartItem } from '../cart-item';
 import { Router } from '@angular/router';
+import { CartService } from '../cart.service';
 
 @Component({
   selector: 'app-checkout',
@@ -11,12 +12,16 @@ import { Router } from '@angular/router';
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss']
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnInit {
   checkoutForm: FormGroup;
   cartItems: CartItem[] = [];
-  totalprice = 0;
+  totalPrice = 0;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private cartService: CartService
+  ) {
     this.checkoutForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -24,20 +29,22 @@ export class CheckoutComponent {
       address: ['', [Validators.required, Validators.minLength(10)]],
       paymentMethod: ['credit-card', Validators.required]
     });
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state) {
-      this.cartItems = navigation.extras.state['cartItems'];
-    }
-    console.log(this.cartItems);
   }
 
-  get totalPrice(): number {
+  ngOnInit() {
+    this.cartService.currentCartItems.subscribe(items => {
+      this.cartItems = items;
+      this.totalPrice = this.calculateTotal();
+    });
+  }
+
+  calculateTotal(): number {
     return parseFloat(this.cartItems.reduce(
       (total, item) => total + (item.price * item.quantity), 0
     ).toFixed(2));
   }
 
-  getItemTotal(item: any): number {
+  getItemTotal(item: CartItem): number {
     return item.price * item.quantity;
   }
 
@@ -52,22 +59,23 @@ export class CheckoutComponent {
       
       console.log('Order submitted:', order);
       // Here you would typically send the order to your backend
+      this.cartService.clearCart();
       alert('Order submitted successfully!');
+      this.router.navigate(['/']);
     } else {
       alert('Please fill out all required fields correctly.');
     }
   }
 
   removeItem(id: string): void {
-    this.cartItems = this.cartItems.filter(item => item._id !== id);
+    this.cartService.removeItem(id);
   }
 
-  updateQuantity(item: any, change: number): void {
-    const newQuantity = item.quantity + change;
-    if (newQuantity > 0) {
-      item.quantity = newQuantity;
+  updateQuantity(item: CartItem, change: number): void {
+    if (change > 0) {
+      this.cartService.increaseQuantity(item._id);
     } else {
-      this.removeItem(item.id);
+      this.cartService.decreaseQuantity(item._id);
     }
   }
 }

@@ -1,4 +1,3 @@
-// cart.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { CartItem } from './cart-item';
@@ -7,23 +6,27 @@ import { CartItem } from './cart-item';
   providedIn: 'root'
 })
 export class CartService {
-  private cartItems = new BehaviorSubject<CartItem[]>([]);
-  currentCartItems = this.cartItems.asObservable();
+  private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
+  currentCartItems = this.cartItemsSubject.asObservable();
 
   constructor() {
+    this.loadInitialCart();
+  }
+
+  private loadInitialCart() {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-      this.cartItems.next(JSON.parse(savedCart));
+      this.cartItemsSubject.next(JSON.parse(savedCart));
     }
   }
 
   private updateCart(items: CartItem[]) {
-    this.cartItems.next(items);
+    this.cartItemsSubject.next(items);
     localStorage.setItem('cart', JSON.stringify(items));
   }
 
   addToCart(item: CartItem) {
-    const currentItems = this.cartItems.getValue();
+    const currentItems = this.cartItemsSubject.getValue();
     const existingItem = currentItems.find(i => i._id === item._id);
     
     if (existingItem) {
@@ -36,21 +39,21 @@ export class CartService {
   }
 
   removeItem(bookId: string) {
-    const currentItems = this.cartItems.getValue().filter(item => item._id !== bookId);
-    this.cartItems.next(currentItems);
+    const currentItems = this.cartItemsSubject.getValue().filter(item => item._id !== bookId);
+    this.updateCart(currentItems);
   }
 
   increaseQuantity(bookId: string) {
-    const currentItems = this.cartItems.getValue();
+    const currentItems = this.cartItemsSubject.getValue();
     const item = currentItems.find(item => item._id === bookId);
     if (item) {
       item.quantity++;
-      this.cartItems.next([...currentItems]);
+      this.updateCart([...currentItems]);
     }
   }
 
   decreaseQuantity(bookId: string) {
-    const currentItems = this.cartItems.getValue();
+    const currentItems = this.cartItemsSubject.getValue();
     const item = currentItems.find(item => item._id === bookId);
     if (item) {
       if (item.quantity > 1) {
@@ -59,11 +62,16 @@ export class CartService {
         this.removeItem(bookId);
         return;
       }
-      this.cartItems.next([...currentItems]);
+      this.updateCart([...currentItems]);
     }
   }
 
   clearCart() {
-    this.cartItems.next([]);
+    this.cartItemsSubject.next([]);
+    localStorage.removeItem('cart');
+  }
+
+  getCurrentCart(): CartItem[] {
+    return this.cartItemsSubject.getValue();
   }
 }

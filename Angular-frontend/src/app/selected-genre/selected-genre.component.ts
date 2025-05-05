@@ -7,39 +7,41 @@ import { CartService } from '../cart.service';
 
 @Component({
   selector: 'app-selected-genre',
+  standalone: true,
   imports: [],
   templateUrl: './selected-genre.component.html',
-  styleUrl: './selected-genre.component.scss'
+  styleUrls: ['./selected-genre.component.scss']
 })
 export class SelectedGenreComponent {
-
+  
   private route = inject(ActivatedRoute);
   genre = signal<string>('');
   BookList: BookModel[] = [];
 
-  constructor(private router: Router, private http: HttpClient, private cartService: CartService) {
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private cartService: CartService
+  ) {
     this.route.queryParams.subscribe(params => {
       this.genre.set(params['genre']);
+      this.getBooksByGenre();
     });
-    this.getBooksByGenre();
   }
 
   getBooksByGenre() {
-      const currentGenre = this.genre();
-      if (!currentGenre) return;
+    const currentGenre = this.genre();
+    if (!currentGenre) return;
 
-      this.http.get<BookModel[]>(`https://restful-api-sca9.onrender.com/book/genre/${currentGenre}`).subscribe((res: BookModel[]) => {
-        this.BookList = res;
-        console.log(res);
-        console.log(this.BookList);
-      })
-    }
+    this.http.get<BookModel[]>(`https://restful-api-sca9.onrender.com/book/genre/${currentGenre}`)
+      .subscribe({
+        next: (res: BookModel[]) => this.BookList = res,
+        error: (err) => console.error('Error fetching books:', err)
+      });
+  }
 
   navigateToSpecificBook(title: string) {
-    this.router.navigate(['/Book'], {
-      queryParams: { title: title },
-      queryParamsHandling: 'merge',
-    });
+    this.router.navigate(['/book'], { queryParams: { title } });
   }
 
   addToCart(book: BookModel) {
