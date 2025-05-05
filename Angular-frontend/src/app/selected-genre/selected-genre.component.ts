@@ -1,8 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { BookModel } from '../book-model';
 import { HttpClient } from '@angular/common/http';
+import { CartItem } from '../cart-item';
+import { CartService } from '../cart.service';
 
 @Component({
   selector: 'app-selected-genre',
@@ -14,36 +15,42 @@ export class SelectedGenreComponent {
 
   private route = inject(ActivatedRoute);
   genre = signal<string>('');
+  BookList: BookModel[] = [];
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient, private cartService: CartService) {
     this.route.queryParams.subscribe(params => {
       this.genre.set(params['genre']);
     });
     this.getBooksByGenre();
   }
 
-  BookList: any[]= [];
-
   getBooksByGenre() {
       const currentGenre = this.genre();
       if (!currentGenre) return;
 
-      this.http.get<BookModel[]>(`https://restful-api-sca9.onrender.com/book/genre/${currentGenre}`).subscribe((res:any) => {
+      this.http.get<BookModel[]>(`https://restful-api-sca9.onrender.com/book/genre/${currentGenre}`).subscribe((res: BookModel[]) => {
         this.BookList = res;
         console.log(res);
         console.log(this.BookList);
       })
     }
 
-  addToCart(e: Event): void { // Selected Book: Book
-    console.log("Weird");
-  }
-
   navigateToSpecificBook(title: string) {
     this.router.navigate(['/Book'], {
       queryParams: { title: title },
       queryParamsHandling: 'merge',
     });
+  }
+
+  addToCart(book: BookModel) {
+    if (!book) return;
+
+    const cartItem: CartItem = {
+      ...book,
+      quantity: 1
+    };
+    
+    this.cartService.addToCart(cartItem);
   }
 
 }

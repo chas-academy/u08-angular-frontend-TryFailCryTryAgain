@@ -1,7 +1,6 @@
 // cart.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { BookModel } from './book-model';
 import { CartItem } from './cart-item';
 
 @Injectable({

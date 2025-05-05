@@ -14,11 +14,7 @@ export class SelectedBookComponent {
   private route = inject(ActivatedRoute);
   title = signal<string>('');
 
-  constructor(
-    private router: Router, 
-    private http: HttpClient, 
-    private cartService: CartService  // Note lowercase 'c' for consistency
-  ) {
+  constructor(private router: Router, private http: HttpClient, private cartService: CartService) {
     this.route.queryParams.subscribe(params => {
       this.title.set(params['title']);
     });
