@@ -1,17 +1,47 @@
 <main class="wrapper">
     <section class="upper">
+    @defer (on timer(500ms)) {
         <h2>{{ genre() }}</h2>
+    } @placeholder {
+        <div class="loading_container">
+            <p class="loading_circle"></p> <!-- Add animation to the loading data -->
+        </div>
+    } @loading {
+        <div class="loading_container">
+            <p class="loading_circle"></p> <!-- Add animation to the loading data -->
+        </div>
+    } @error {
+        <div class="loading_container">
+            <p>Failed to load Books. Please reload the page! </p> <!-- Add Error box-->
+        </div>
+    }
     </section>
     <div class="divider"></div>
 
     <section class="book_wrapper">
+    @defer (on timer(500ms)) {    
         @for (Book of BookList; track $index) {
             <div class="book_card">
-                <a [routerLink]="['/book', Book.id]"><h2>{{ Book.title }}</h2></a>
-                <a [routerLink]="['/book', Book.id]"><h3>By {{ Book.author }}</h3></a>
-                <a [routerLink]="['/book', Book.id]"><h4>€ {{ Book.price }}</h4></a>
+                <a (click)="navigateToSpecificBook(Book.title)"><h2>{{ Book.title }}</h2></a> <!-- updated to .id when the API has been upgraded -->
+                <a (click)="navigateToSpecificBook(Book.title)"><h3>By {{ Book.author }}</h3></a>
+                <a (click)="navigateToSpecificBook(Book.title)"><h4>€ {{ Book.price }}</h4></a>
                 <button (click)="addToCart($event)">Add to Cart</button>
             </div>
         }
+    } @placeholder {
+        <div class="loading_container">
+            <p class="loading_circle"></p> <!-- Add animation to the loading data -->
+        </div>
+    } @loading {
+        <div class="loading_container">
+            <p class="loading_circle"></p> <!-- Add animation to the loading data -->
+        </div>
+    } @error {
+        <div class="loading_container">
+            <p>Failed to load Books. Please reload the page! </p> <!-- Add Error box-->
+        </div>
+    }
     </section>
+
+
 </main>

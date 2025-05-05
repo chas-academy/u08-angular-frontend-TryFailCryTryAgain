@@ -115,6 +115,25 @@
     }
 }
 
+.loading_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 95vw;
+
+    .loading_circle {
+      width: 50px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 8px solid lightblue;
+      border-right-color: var.$dark_blue;
+      animation: l2 1s infinite linear;
+    }
+
+    @keyframes l2 {to{transform: rotate(1turn)}}
+
+  }
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
     .wrapper .book_wrapper {

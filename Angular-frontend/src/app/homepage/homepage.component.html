@@ -6,7 +6,7 @@
             <button (click)="toggleShopDropdown()">Browse Books</button> <!-- Same functionallity as the header "books" -->
             <div class="dropdown-content" If="isShopDropdownOpen">
                 @for (bookGenre of bookGenres; track $index) {
-                <a (click)="closeShopDropdown()" [routerLink]="bookGenre">{{ bookGenre }}</a> <!-- routerLink]="bookGenre" -->
+                <a (click)="navigateToGenre(bookGenre)">{{ bookGenre }}</a> <!-- routerLink]="bookGenre" -->
                 }
             </div>
         </div>
@@ -18,7 +18,7 @@
         @defer (on timer(500ms)) {
         <div class="book_container">
             @for (book of displayedBooks; track book._id) {
-                <button class="book_card" [routerLink]="book._id">
+                <button class="book_card" [routerLink]="book._id"> <!-- Change this route so it goes with a function inside the .ts component part -->
                     <h3>{{ book.title }}</h3>
                     <h4>€ {{ book.price }}</h4>
                 </button>

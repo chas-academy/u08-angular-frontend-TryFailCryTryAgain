@@ -1,9 +1,10 @@
-// header.component.ts
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BookModel } from '../book-model';
 import { HttpClient } from '@angular/common/http';
+import { CartService } from '../cart.service';
+import { CartItem } from '../cart-item';
 
 @Component({
   selector: 'app-header',
@@ -12,56 +13,41 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+  cartItems: CartItem[] = [];
+  totalPrice = 0;
+  bookGenres: any[] = [];
+  isShopDropdownOpen = false;
+  isCartOpen = false;
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private cartService: CartService
+  ) {
     this.getBooks();
+    this.cartService.currentCartItems.subscribe(items => {
+      this.cartItems = items;
+      this.calculateTotal();
+    });
   }
 
-  bookGenres: any[]= [];
-
-
   getBooks() {
-      this.http.get<BookModel[]>('https://restful-api-sca9.onrender.com/book/').subscribe((res:any) => {
-        this.bookGenres = [...new Set(res.map((book: BookModel) => book.genre))];
-        console.log(res);
-        console.log(this.bookGenres);
-      })
-    }
+    this.http.get<BookModel[]>('https://restful-api-sca9.onrender.com/book/').subscribe((res: any) => {
+      this.bookGenres = [...new Set(res.map((book: BookModel) => book.genre))];
+    });
+  }
 
-  isShopDropdownOpen = false;
+  navigateToGenre(genre: string) {
+    this.closeShopDropdown();
+    this.router.navigate(['/Genre'], {
+      queryParams: { genre: genre },
+      queryParamsHandling: 'merge',
+      onSameUrlNavigation: 'reload'
+    }).then(() => {
+      window.location.reload();
+    });
+  }
 
-  // Mock cart items data
-  cartItems = [
-    { 
-      id: '001', 
-      title: 'The Silent Patient', 
-      author: 'Alex Michaelides',
-      quantity: 1, 
-      price: 12.99,
-      image: 'https://example.com/silent-patient.jpg'
-    },
-    { 
-      id: '002', 
-      title: 'Dune', 
-      author: 'Frank Herbert',
-      quantity: 2, 
-      price: 9.99,
-      image: 'https://example.com/dune.jpg'
-    },
-    { 
-      id: '003', 
-      title: 'Atomic Habits', 
-      author: 'James Clear',
-      quantity: 1, 
-      price: 14.95,
-      image: 'https://example.com/atomic-habits.jpg'
-    }
-  ];
-
-  isCartOpen = false;
-  totalPrice = this.calculateTotal(); // Initialize total price
-
-  // Function to toggle the dropdown menus
   toggleShopDropdown(): void {
     this.isShopDropdownOpen = !this.isShopDropdownOpen;
   }
@@ -78,59 +64,36 @@ export class HeaderComponent {
     this.isCartOpen = false;
   }
 
-  addToCart(book: any) {
-    const existingItem = this.cartItems.find(item => item.id === book.id);
-    if (existingItem) {
-      existingItem.quantity++;
-    } else {
-      this.cartItems.push({ ...book, quantity: 1 });
-    }
-    this.calculateTotal();
+  addToCart(book: CartItem) {
+    this.cartService.addToCart(book);
   }
 
   removeItem(bookId: string) {
-    this.cartItems = this.cartItems.filter(item => item.id !== bookId);
-    this.calculateTotal();
+    this.cartService.removeItem(bookId);
   }
 
   increaseQuantity(bookId: string) {
-    const item = this.cartItems.find(item => item.id === bookId);
-    if (item) {
-      item.quantity++;
-      this.calculateTotal();
-    }
+    this.cartService.increaseQuantity(bookId);
   }
 
   decreaseQuantity(bookId: string) {
-    const item = this.cartItems.find(item => item.id === bookId);
-    if (item) {
-      if (item.quantity > 1) {
-        item.quantity--;
-      } else {
-        this.removeItem(bookId);
-      }
-      this.calculateTotal();
-    }
+    this.cartService.decreaseQuantity(bookId);
   }
 
   clearCart() {
-    this.cartItems = [];
-    this.totalPrice = 0;
+    this.cartService.clearCart();
     this.closeCart();
   }
 
   calculateTotal(): number {
     this.totalPrice = parseFloat(this.cartItems.reduce(
-      (total, item) => total + (item.price * item.quantity), 0
+      (total, item) => total + (item.price * (item.quantity || 1)), 0
     ).toFixed(2));
     return this.totalPrice;
   }
 
   checkout() {
-    // Implement your checkout logic
     console.log('Proceeding to checkout', this.cartItems);
     this.router.navigate(['/checkout']);
-    // You might want to navigate to a checkout page
-    // this.router.navigate(['/checkout']);
   }
 }

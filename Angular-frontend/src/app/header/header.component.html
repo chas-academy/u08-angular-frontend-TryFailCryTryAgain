@@ -10,7 +10,7 @@
           <!-- Make this dynamic -->
           <div class="dropdown-content" If="isShopDropdownOpen">
             @for (bookGenre of bookGenres; track $index) {
-              <a (click)="closeShopDropdown()" [routerLink]="['/', bookGenre]" [queryParams]="{genre: bookGenre}">{{ bookGenre }}</a> <!-- routerLink]="bookGenre" -->
+              <a (click)="navigateToGenre(bookGenre)">{{ bookGenre }}</a> <!-- routerLink]="bookGenre" -->
               }
           </div>
         </li>
@@ -39,14 +39,14 @@
     @if (cartItems.length === 0) {
       <p class="empty-cart">Your cart is empty</p>
     }
-    @for (item of cartItems; track item.id) {
+    @for (item of cartItems; track item._id) {
       <div class="cart-item">
         <span class="item-title"> {{ item.title }}</span>
         <div class="item-controls">
-          <button (click)="decreaseQuantity(item.id)">-</button>
+          <button (click)="decreaseQuantity(item._id)">-</button>
           <span class="item-quantity"> {{ item.quantity }} </span>
-          <button (click)="increaseQuantity(item.id)">+</button>
-          <button (click)="removeItem(item.id)" class="remove-btn">
+          <button (click)="increaseQuantity(item._id)">+</button>
+          <button (click)="removeItem(item._id)" class="remove-btn">
             <i class="fas fa-trash"></i>
           </button>
         </div>

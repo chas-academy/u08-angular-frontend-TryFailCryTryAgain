@@ -26,14 +26,14 @@ export const routes: Routes = [
         ],
     },
     {
-        path: 'book/book_id',
+        path: 'Book',
         component: LayoutComponent,
         children: [
             { path: '', component: SelectedBookComponent },
         ],
     },
     {
-        path: 'Fiction',
+        path: 'Genre',
         component: LayoutComponent,
         children: [
             { path: '', component: SelectedGenreComponent },

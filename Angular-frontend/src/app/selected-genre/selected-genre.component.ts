@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { BookModel } from '../book-model';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-selected-genre',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './selected-genre.component.html',
   styleUrl: './selected-genre.component.scss'
 })
@@ -15,7 +15,7 @@ export class SelectedGenreComponent {
   private route = inject(ActivatedRoute);
   genre = signal<string>('');
 
-  constructor(private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient) {
     this.route.queryParams.subscribe(params => {
       this.genre.set(params['genre']);
     });
@@ -37,6 +37,13 @@ export class SelectedGenreComponent {
 
   addToCart(e: Event): void { // Selected Book: Book
     console.log("Weird");
-}
+  }
+
+  navigateToSpecificBook(title: string) {
+    this.router.navigate(['/Book'], {
+      queryParams: { title: title },
+      queryParamsHandling: 'merge',
+    });
+  }
 
 }
