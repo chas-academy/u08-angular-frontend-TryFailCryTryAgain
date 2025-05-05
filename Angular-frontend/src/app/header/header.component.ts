@@ -94,6 +94,8 @@ export class HeaderComponent {
 
   checkout() {
     console.log('Proceeding to checkout', this.cartItems);
-    this.router.navigate(['/checkout']);
+    this.router.navigate(['/checkout'], {
+      state: { cartItems: this.cartItems }
+    });
   }
 }

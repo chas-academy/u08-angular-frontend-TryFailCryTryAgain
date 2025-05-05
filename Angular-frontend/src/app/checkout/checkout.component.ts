@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { CartItem } from '../cart-item';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-checkout',
@@ -12,13 +13,10 @@ import { RouterLink } from '@angular/router';
 })
 export class CheckoutComponent {
   checkoutForm: FormGroup;
-  cartItems: any[] = [
-    { id: '001', title: 'The Silent Patient', quantity: 1, price: 12.99 },
-    { id: '002', title: 'Dune', quantity: 2, price: 9.99 },
-    { id: '003', title: 'Atomic Habits', quantity: 1, price: 14.95 }
-  ];
+  cartItems: CartItem[] = [];
+  totalprice = 0;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.checkoutForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -26,6 +24,11 @@ export class CheckoutComponent {
       address: ['', [Validators.required, Validators.minLength(10)]],
       paymentMethod: ['credit-card', Validators.required]
     });
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+      this.cartItems = navigation.extras.state['cartItems'];
+    }
+    console.log(this.cartItems);
   }
 
   get totalPrice(): number {
@@ -56,7 +59,7 @@ export class CheckoutComponent {
   }
 
   removeItem(id: string): void {
-    this.cartItems = this.cartItems.filter(item => item.id !== id);
+    this.cartItems = this.cartItems.filter(item => item._id !== id);
   }
 
   updateQuantity(item: any, change: number): void {

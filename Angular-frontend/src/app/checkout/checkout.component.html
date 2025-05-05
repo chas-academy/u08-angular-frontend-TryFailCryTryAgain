@@ -17,7 +17,7 @@
             </thead>
             <tbody>
             <tr *ngFor="let item of cartItems">
-                <td>{{ item.id }}</td>
+                <td>{{ item._id }}</td>
                 <td>{{ item.title }}</td>
                 <td>
                     <div class="quantity-controls">
@@ -29,7 +29,7 @@
                 <td>${{ item.price.toFixed(2) }}</td>
                 <td>${{ getItemTotal(item).toFixed(2) }}</td>
                 <td>
-                <button (click)="removeItem(item.id)">Remove</button>
+                <button (click)="removeItem(item._id)">Remove</button>
                 </td>
             </tr>
             </tbody>
