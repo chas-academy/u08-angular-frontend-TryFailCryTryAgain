@@ -46,11 +46,19 @@
             <h3>Customer Information</h3>
             <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
                 <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" formControlName="name">
-                <div *ngIf="checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched" class="error">
-                    Please enter a valid name (min 3 characters)
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" formControlName="first_name">
+                <div *ngIf="checkoutForm.get('first_name')?.invalid && checkoutForm.get('first_name')?.touched" class="error">
+                    Please enter a valid name (min 2 characters)
                 </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" formControlName="last_name">
+                    <div *ngIf="checkoutForm.get('last_name')?.invalid && checkoutForm.get('last_name')?.touched" class="error">
+                        Please enter a valid name (min 2 characters)
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -87,7 +95,7 @@
                 </div>
 
                 <button type="submit" [disabled]="checkoutForm.invalid || cartItems.length === 0" class="submit-btn">
-                Place Order
+                    Place Order
                 </button>
             </form>
         </div>

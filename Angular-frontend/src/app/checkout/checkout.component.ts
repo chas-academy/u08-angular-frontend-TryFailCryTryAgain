@@ -23,7 +23,8 @@ export class CheckoutComponent implements OnInit {
     private cartService: CartService
   ) {
     this.checkoutForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      first_name: ['', [Validators.required, Validators.minLength(2)]],
+      last_name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10,15}$/)]],
       address: ['', [Validators.required, Validators.minLength(10)]],
