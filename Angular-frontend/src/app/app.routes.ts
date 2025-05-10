@@ -7,14 +7,27 @@ import { SelectedGenreComponent } from './selected-genre/selected-genre.componen
 import { SelectedBookComponent } from './selected-book/selected-book.component';
 import { CheckoutComponent } from './checkout/checkout.component';
 import { AdminComponent } from './admin/admin.component';
+import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
+import { BookDashboardComponent } from './book-dashboard/book-dashboard.component';
+import { ReviewDashboardComponent } from './review-dashboard/review-dashboard.component';
+import { OrderDashboardComponent } from './order-dashboard/order-dashboard.component';
 
 export const routes: Routes = [
     {
         path: 'admin',
         component: LayoutComponent,
         children: [
-            { path: '', component: AdminComponent },
-        ],
+            {
+                path: '',
+                component: AdminComponent,
+                children: [
+                    { path: 'users', component: UserDashboardComponent },
+                    { path: 'books', component: BookDashboardComponent },
+                    { path: 'reviews', component: ReviewDashboardComponent },
+                    { path: 'orders', component: OrderDashboardComponent }
+                ]
+            }
+        ]
     },
     {
         path: 'test',
