@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { NewPageComponent } from './new-page/new-page.component';
 import { LayoutComponent } from './layout.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { ContactComponent } from './contact/contact.component';
@@ -30,13 +29,6 @@ export const routes: Routes = [
         ]
     },
     {
-        path: 'test',
-        component: LayoutComponent,
-        children: [
-            { path: '', component: NewPageComponent },
-        ],
-    },
-    {
         path: 'checkout',
         component: LayoutComponent,
         children: [
@@ -58,10 +50,6 @@ export const routes: Routes = [
         ],
     },
     {
-        path: 'contact2',
-        component: ContactComponent,
-    },
-    {
         path: 'contact',
         component: LayoutComponent,
         children: [
@@ -73,13 +61,6 @@ export const routes: Routes = [
         component: LayoutComponent,
         children: [
             { path: '', component: HomepageComponent },
-        ],
-    },
-    {
-        path: 'new-page',
-        component: LayoutComponent,
-        children: [
-            { path: '', component: NewPageComponent },
         ],
     },
 ];
