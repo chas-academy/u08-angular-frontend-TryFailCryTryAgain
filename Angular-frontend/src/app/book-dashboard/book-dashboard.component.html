@@ -1,1 +1,213 @@
-<p>book-dashboard works!</p>
+<section class="dashboard">
+    <span class="title_section">
+        <h2>Books</h2>
+        <span class="button-container">
+            <button (click)="toggleCreateForm()">
+                {{ CreateSelectedBook() ? 'Cancel' : 'Create' }}
+            </button>
+            <button (click)="freshBookUpdate()">Refresh</button>
+        </span>
+    </span>
+    <div class="api_outlet">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Genre</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Description</th>
+                    <th>Publish Date</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (books(); as books) {
+                    @for (book of books; track book._id) {
+                        <tr>
+                            <td>{{ book.title }}</td>
+                            <td>{{ book.author }}</td>
+                            <td>{{ book.genre }}</td>
+                            <td>{{ book.price }}</td>
+                            <td>{{ book.stock }}</td>
+                            <td>{{ book.description }}</td>
+                            <td>{{ book.publishedDate }}</td>
+                            <td>
+                                <button class="edit" (click)="displaySelectedBook(book)">
+                                    Edit
+                                </button>
+                            </td>
+                            <td>
+                                <button class="delete" (click)="onDeleteBook(book._id)">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    } @empty {
+                        <tr><td colspan="9">No books found</td></tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (selectedBook()) {
+        <section class="edit_form">
+            <div class="form-container">
+                <h3>Edit Book {{ selectedBook()?.title }}</h3>
+                <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
+                    <div class="form-group">
+                        <label for="edit-title">Title</label>
+                        <input type="text" id="edit-title" formControlName="title" required>
+                        @if (editForm.controls.title.invalid && editForm.controls.title.touched) {
+                            <div class="error-message">
+                                @if (editForm.controls.title.errors?.['required']) {
+                                    <span>Title is required</span>
+                                }
+                                @if (editForm.controls.title.errors?.['minlength']) {
+                                    <span>Minimum 3 characters required</span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-author">Author</label>
+                        <input type="text" id="edit-author" formControlName="author" required>
+                        @if (editForm.controls.author.invalid && editForm.controls.author.touched) {
+                            <div class="error-message">Author is required</div>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-genre">Genre</label>
+                        <select id="edit-genre" formControlName="genre" required>
+                            <option value="Fiction">Fiction</option>
+                            <option value="Non-Fiction">Non-Fiction</option>
+                            <option value="Science Fiction">Science Fiction</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Mystery">Mystery</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-price">Price ($)</label>
+                            <input type="number" id="edit-price" formControlName="price" min="0" step="0.01" required>
+                            @if (editForm.controls.price.invalid) {
+                                <div class="error-message">Valid price required</div>
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-stock">Stock</label>
+                            <input type="number" id="edit-stock" formControlName="stock" min="0" required>
+                            @if (editForm.controls.stock.invalid) {
+                                <div class="error-message">Valid stock count required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-publishedDate">Published Date</label>
+                        <input type="date" id="edit-publishedDate" formControlName="publishedDate" required>
+                        @if (editForm.controls.publishedDate.invalid) {
+                            <div class="error-message">Published date is required</div>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-description">Description</label>
+                        <textarea id="edit-description" formControlName="description" rows="4"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" (click)="cancelEdit()" class="cancel">Cancel</button>
+                        <button type="submit" class="save" [disabled]="!editForm.valid">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    }
+
+    @if (CreateSelectedBook()) {
+        <section class="create_form">
+            <div class="form-container">
+                <h3>Create Book</h3>
+                <form [formGroup]="createForm" (ngSubmit)="onCreateSubmit()">
+                    <div class="form-group">
+                        <label for="create-title">Title</label>
+                        <input type="text" id="create-title" formControlName="title" required>
+                        @if (createForm.controls.title.invalid && createForm.controls.title.touched) {
+                            <div class="error-message">
+                                @if (createForm.controls.title.errors?.['required']) {
+                                    <span>Title is required</span>
+                                }
+                                @if (createForm.controls.title.errors?.['minlength']) {
+                                    <span>Minimum 3 characters required</span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-author">Author</label>
+                        <input type="text" id="create-author" formControlName="author" required>
+                        @if (createForm.controls.author.invalid && createForm.controls.author.touched) {
+                            <div class="error-message">Author is required</div>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-genre">Genre</label>
+                        <select id="create-genre" formControlName="genre" required>
+                            <option value="Fiction">Fiction</option>
+                            <option value="Non-Fiction">Non-Fiction</option>
+                            <option value="Science Fiction">Science Fiction</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Mystery">Mystery</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="create-price">Price ($)</label>
+                            <input type="number" id="create-price" formControlName="price" min="0" step="0.01" required>
+                            @if (createForm.controls.price.invalid) {
+                                <div class="error-message">Valid price required</div>
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label for="create-stock">Stock</label>
+                            <input type="number" id="create-stock" formControlName="stock" min="0" required>
+                            @if (createForm.controls.stock.invalid) {
+                                <div class="error-message">Valid stock count required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-publishedDate">Published Date</label>
+                        <input type="date" id="create-publishedDate" formControlName="publishedDate" required>
+                        @if (createForm.controls.publishedDate.invalid) {
+                            <div class="error-message">Published date is required</div>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-description">Description</label>
+                        <textarea id="create-description" formControlName="description" rows="4"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" (click)="toggleCreateForm()" class="cancel">Cancel</button>
+                        <button type="submit" class="save" [disabled]="!createForm.valid">Create Book</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    }
+</section>

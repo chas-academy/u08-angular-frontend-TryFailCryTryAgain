@@ -2,15 +2,16 @@
     <span class="title_section">
         <h2>Users</h2>
         <span class="button-container">
-            <button>Create</button>
-            <button>Fetch</button>
+            <button (click)="toggleCreateForm()">
+                {{ createSelectedUser() ? 'Cancel' : 'Create' }}
+            </button>
+            <button (click)="refreshUsers()">Refresh</button>
         </span>
     </span>
     <div class="api_outlet">
         <table>
             <thead>
                 <tr>
-                    <th>User ID</th>
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Phone</th>
@@ -19,35 +20,132 @@
                     <th>ZIP</th>
                     <th></th>
                     <th></th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td data-label="User ID">123..</td>
-                    <td data-label="First Name">Steve</td>
-                    <td data-label="Last Name">Doe</td>
-                    <td data-label="Phone">070 000 000</td>
-                    <td data-label="Email">Steve&#64;email.com</td>
-                    <td data-label="Address">Saint Loise 123 st.</td>
-                    <td data-label="ZIP">752 00</td>
-                    <td></td>
-                    <td><button class="edit">Edit</button></td>
-                    <td><button class="delete">Delete</button></td>
-                </tr>
-                <tr>
-                    <td data-label="User ID">123..</td>
-                    <td data-label="First Name">Steve</td>
-                    <td data-label="Last Name">Doe</td>
-                    <td data-label="Phone">070 000 000</td>
-                    <td data-label="Email">Steve&#64;email.com</td>
-                    <td data-label="Address">Saint Loise 123 st.</td>
-                    <td data-label="ZIP">752 00</td>
-                    <td></td>
-                    <td><button class="edit">Edit</button></td>
-                    <td><button class="delete">Delete</button></td>
-                </tr>
+                @if (users(); as users) {
+                    @for (user of users; track user._id) {
+                        <tr>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td>{{ user.phone }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.address }}</td>
+                            <td>{{ user.ZIP }}</td>
+                            <td>
+                                <button class="edit" (click)="displaySelectedUser(user)">
+                                    Edit
+                                </button>
+                            </td>
+                            <td>
+                                <button class="delete" (click)="onDeleteUser(user._id)">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    } @empty {
+                        <tr><td colspan="8">No users found</td></tr>
+                    }
+                }
             </tbody>
         </table>
-    </div>    
+    </div>
+
+    @if (selectedUser()) {
+        <section class="edit_form">
+            <div class="form-container">
+                <h3>Edit User {{ selectedUser()?.first_name }} {{ selectedUser()?.last_name }}</h3>
+                <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
+                    <div class="form-group">
+                        <label for="edit-first_name">First Name</label>
+                        <input type="text" id="edit-first_name" formControlName="first_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-last_name">Last Name</label>
+                        <input type="text" id="edit-last_name" formControlName="last_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-phone">Phone</label>
+                        <input type="tel" id="edit-phone" formControlName="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-email">Email</label>
+                        <input type="email" id="edit-email" formControlName="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-password">Password</label>
+                        <input type="password" id="edit-password" formControlName="password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-address">Address</label>
+                        <input type="text" id="edit-address" formControlName="address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-ZIP">ZIP Code</label>
+                        <input type="number" id="edit-ZIP" formControlName="ZIP" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" (click)="cancelEdit()" class="cancel">Cancel</button>
+                        <button type="submit" class="save" [disabled]="!editForm.valid">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    }
+
+    @if (createSelectedUser()) {
+        <section class="create_form">
+            <div class="form-container">
+                <h3>Create User</h3>
+                <form [formGroup]="createForm" (ngSubmit)="onCreateSubmit()">
+                    <div class="form-group">
+                        <label for="create-first_name">First Name</label>
+                        <input type="text" id="create-first_name" formControlName="first_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-last_name">Last Name</label>
+                        <input type="text" id="create-last_name" formControlName="last_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-phone">Phone</label>
+                        <input type="tel" id="create-phone" formControlName="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-email">Email</label>
+                        <input type="email" id="create-email" formControlName="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-password">Password</label>
+                        <input type="password" id="create-password" formControlName="password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-address">Address</label>
+                        <input type="text" id="create-address" formControlName="address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-ZIP">ZIP Code</label>
+                        <input type="number" id="create-ZIP" formControlName="ZIP" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" (click)="toggleCreateForm()" class="cancel">Cancel</button>
+                        <button type="submit" class="save" [disabled]="!createForm.valid">Create User</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    }
 </section>

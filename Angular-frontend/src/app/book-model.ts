@@ -6,5 +6,5 @@ export interface BookModel {
     price: number;
     stock: number;
     description: string;
-    publishedDate: Date;
+    publishedDate: string;
 }

@@ -1,1 +1,141 @@
-<p>order-dashboard works!</p>
+<section class="dashboard">
+    <span class="title_section">
+        <h2>Orders</h2>
+        <span class="button-container">
+            <button (click)="toggleCreateForm()">
+                {{ createSelectedOrder() ? 'Cancel' : 'Create' }}
+            </button>
+            <button (click)="refreshOrders()">Refresh</button>
+        </span>
+    </span>
+    <div class="api_outlet">
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Book IDs</th>
+                    <th>Total Amount</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (orders(); as orders) {
+                    @for (order of orders; track order._id) {
+                        <tr>
+                            <td>{{ order.userId }}</td>
+                            <td>{{ order.bookIds.join(', ') }}</td>
+                            <td>{{ order.totalAmount | currency }}</td>
+                            <td>{{ order.orderDate | date }}</td>
+                            <td>{{ order.status }}</td>
+                            <td>
+                                <button class="edit" (click)="displaySelectedOrder(order)">
+                                    Edit
+                                </button>
+                            </td>
+                            <td>
+                                <button class="delete" (click)="onDeleteOrder(order._id)">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    } @empty {
+                        <tr><td colspan="7">No orders found</td></tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (selectedOrder()) {
+        <section class="edit_form">
+            <div class="form-container">
+                <h3>Edit Order</h3>
+                <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
+                    <div class="form-group">
+                        <label for="edit-userId">User ID</label>
+                        <input type="text" id="edit-userId" formControlName="userId" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-bookIds">Book IDs (comma separated)</label>
+                        <input type="text" id="edit-bookIds" formControlName="bookIds" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-totalAmount">Total Amount</label>
+                        <input type="number" id="edit-totalAmount" formControlName="totalAmount" min="0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-orderDate">Order Date</label>
+                        <input type="date" id="edit-orderDate" formControlName="orderDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-status">Status</label>
+                        <select id="edit-status" formControlName="status" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" (click)="cancelEdit()" class="cancel">Cancel</button>
+                        <button type="submit" class="save" [disabled]="!editForm.valid">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    }
+
+    @if (createSelectedOrder()) {
+        <section class="create_form">
+            <div class="form-container">
+                <h3>Create Order</h3>
+                <form [formGroup]="createForm" (ngSubmit)="onCreateSubmit()">
+                    <div class="form-group">
+                        <label for="create-userId">User ID</label>
+                        <input type="text" id="create-userId" formControlName="userId" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-bookIds">Book IDs (comma separated)</label>
+                        <input type="text" id="create-bookIds" formControlName="bookIds" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-totalAmount">Total Amount</label>
+                        <input type="number" id="create-totalAmount" formControlName="totalAmount" min="0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-orderDate">Order Date</label>
+                        <input type="date" id="create-orderDate" formControlName="orderDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-status">Status</label>
+                        <select id="create-status" formControlName="status" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" (click)="toggleCreateForm()" class="cancel">Cancel</button>
+                        <button type="submit" class="save" [disabled]="!createForm.valid">Create Order</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    }
+</section>
