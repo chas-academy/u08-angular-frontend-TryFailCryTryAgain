@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { OrderService } from '../api-calls-order.service';
 import { OrderModel } from '../order-model';
+import { UserModel } from '../user-model';
+import { BookModel } from '../book-model';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -22,12 +24,15 @@ export class OrderDashboardComponent {
 
   selectedOrder = signal<OrderModel | null>(null);
   createSelectedOrder = signal(false);
+  selectedBooks = signal<string[]>([]);
 
   orders = toSignal(this.orderService.orders$, { initialValue: [] });
+  users = toSignal(this.orderService.users$, { initialValue: [] });
+  books = toSignal(this.orderService.books$, { initialValue: [] });
 
   createForm = this.fb.nonNullable.group({
     userId: ['', Validators.required],
-    bookIds: ['', Validators.required],
+    bookIds: this.fb.nonNullable.array<string>([], Validators.required),
     totalAmount: [0, [Validators.required, Validators.min(0)]],
     orderDate: ['', Validators.required],
     status: ['Pending', Validators.required]
@@ -35,12 +40,11 @@ export class OrderDashboardComponent {
 
   editForm = this.fb.nonNullable.group({
     userId: ['', Validators.required],
-    bookIds: ['', Validators.required],
+    bookIds: this.fb.nonNullable.array<string>([], Validators.required),
     totalAmount: [0, [Validators.required, Validators.min(0)]],
     orderDate: ['', Validators.required],
     status: ['Pending', Validators.required]
   });
-
   constructor() {
     this.orderService.getOrders().subscribe();
   }
@@ -66,7 +70,7 @@ export class OrderDashboardComponent {
     this.selectedOrder.set({ ...order });
     this.editForm.patchValue({
       ...order,
-      bookIds: order.bookIds.join(', '),
+      bookIds: order.bookIds,
       orderDate: new Date(order.orderDate).toISOString().split('T')[0]
     });
   }
@@ -81,9 +85,8 @@ export class OrderDashboardComponent {
       const orderData = {
         ...formValue,
         orderDate: new Date(formValue.orderDate).toISOString(),
-        bookIds: formValue.bookIds.split(',').map(id => id.trim())
+        bookIds: formValue.bookIds
       };
-
 
       this.orderService.createOrder(orderData).subscribe({
         next: () => {
@@ -105,7 +108,7 @@ export class OrderDashboardComponent {
         ...selectedOrder,
         ...formValue,
         orderDate: new Date(formValue.orderDate).toISOString(),
-        bookIds: formValue.bookIds.split(',').map(id => id.trim())
+        bookIds: formValue.bookIds
       };
 
       this.orderService.orders$.pipe(take(1)).subscribe(orders => {
@@ -116,6 +119,43 @@ export class OrderDashboardComponent {
       });
       
       this.selectedOrder.set(null);
+    }
+  }
+
+  toggleBookSelection(bookId: string, form: 'create' | 'edit') {
+    const formGroup = form === 'create' ? this.createForm : this.editForm;
+    const bookIdsControl = formGroup.get('bookIds');
+    if (!bookIdsControl) return;
+
+    const currentBooks = bookIdsControl.value as string[] || [];
+
+    if (currentBooks.includes(bookId)) {
+      bookIdsControl.patchValue(
+        currentBooks.filter(id => id !== bookId)
+      );
+    } else {
+      bookIdsControl.patchValue(
+        [...currentBooks, bookId]
+      );
+    }
+  
+    this.onBooksChange(bookIdsControl.value as string[], form);
+  }
+
+  calculateTotal(bookIds: string[]): number {
+    const books = this.books();
+    return bookIds.reduce((total, bookId) => {
+      const book = books.find(b => b._id === bookId);
+      return total + (book?.price || 0);
+    }, 0);
+  }
+
+  onBooksChange(bookIds: string[], form: 'create' | 'edit') {
+    const total = this.calculateTotal(bookIds);
+    if (form === 'create') {
+      this.createForm.patchValue({ totalAmount: total });
+    } else {
+      this.editForm.patchValue({ totalAmount: total });
     }
   }
 

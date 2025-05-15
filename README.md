@@ -13,3 +13,9 @@ Login and register page
 User page (see the current users orders, reviews and account details)
 Admin page (see all users, all books including thier reviews, author, genre, stock and price, (include a button to edit said details), include a button to create new books/users/orders and reviews)
 Contact Us Page
+
+
+# Angular Frontend Client
+## BookStore
+
+*Docs*
