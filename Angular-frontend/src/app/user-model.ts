@@ -5,7 +5,7 @@ export interface UserModel {
     phone: number;
     email: string;
     password: string;
-    address: string;
+    adress: string;
     ZIP: number;
 }
 

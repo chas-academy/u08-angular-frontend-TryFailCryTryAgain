@@ -31,7 +31,7 @@ export class UserDashboardComponent {
     phone: [0, Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    address: ['', Validators.required],
+    adress: ['', Validators.required],
     ZIP: [0, Validators.required]
   });
 
@@ -41,7 +41,7 @@ export class UserDashboardComponent {
     phone: [0, Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    address: ['', Validators.required],
+    adress: ['', Validators.required],
     ZIP: [0, Validators.required]
   });
 
