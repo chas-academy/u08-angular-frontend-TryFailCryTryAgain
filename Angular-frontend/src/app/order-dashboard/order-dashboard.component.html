@@ -56,10 +56,10 @@
                 <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
                     <div class="form-group">
                         <label for="edit-userId">User</label>
-                        <select id="edit-userId" formControlName="userId" required>
+                        <select id="edit-userId" formControlName="userId" required ngDefaultControl>
                             <option value="">Select a user</option>
                             @for (user of users(); track user._id) {
-                                <option [value]="user._id" [selected]="user._id === editForm.value.userId">
+                                <option [value]="user._id">
                                     {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
                                 </option>
                             }
@@ -68,42 +68,38 @@
 
                     <div class="form-group">
                         <label>Books</label>
-                        <div class="books-checkbox-container">
-                            @for (book of books(); track book._id) {
-                                <label>
-                                    <input type="checkbox" 
-                                           [value]="book._id"
-                                           [checked]="editForm.value.bookIds?.includes(book._id)"
-                                           (change)="toggleBookSelection(book._id, 'edit')">
-                                    {{ book.title }} ({{ book.price | currency }})
-                                </label>
+                        <div class="books-selection-container">
+                            <select id="book-selector" [formControl]="bookSelectorControl">
+                                <option value="">Select a book</option>
+                                @for (book of books(); track book._id) {
+                                    <option [value]="book._id">{{ book.title }} ({{ book.price | currency }})</option>
+                                }
+                            </select>
+                            <button type="button" (click)="addBookToOrder()" [disabled]="!bookSelectorControl.value">Add Book</button>
+                        </div>
+
+                        <div class="selected-books-list">
+                            @for (item of getSelectedBookItems(); track item.bookId) {
+                                <div class="book-item">
+                                    <span>{{ getBookTitle(item.bookId) }}</span>
+                                    <div class="quantity-controls">
+                                        <button type="button" (click)="decreaseBookQuantity(item.bookId)">-</button>
+                                        <span>{{ item.quantity }}</span>
+                                        <button type="button" (click)="increaseBookQuantity(item.bookId)">+</button>
+                                        <button type="button" (click)="removeBook(item.bookId)" class="remove-btn">×</button>
+                                    </div>
+                                </div>
                             }
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="edit-totalAmount">Total Amount</label>
-                        <input type="number" id="edit-totalAmount" formControlName="totalAmount" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="edit-orderDate">Order Date</label>
-                        <input type="date" id="edit-orderDate" formControlName="orderDate" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="edit-status">Status</label>
-                        <select id="edit-status" formControlName="status" required>
-                            <option value="Pending">Pending</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                    </div>
-
                     <div class="form-actions">
                         <button type="button" (click)="cancelEdit()" class="cancel">Cancel</button>
+                        <div *ngIf="!editForm.valid" class="error-message">
+                            Form is invalid. Errors: {{ editForm.errors | json }}
+                            User valid: {{ editForm.get('userId')?.valid }}
+                            Books valid: {{ editForm.get('bookItems')?.valid }}
+                        </div>
                         <button type="submit" class="save" [disabled]="!editForm.valid">Save Changes</button>
                     </div>
                 </form>
@@ -133,7 +129,7 @@
                                 <label>
                                     <input type="checkbox" 
                                            [value]="book._id"
-                                           (change)="toggleBookSelection(book._id, 'create')">
+                                           (change)="toggleCreateFormBookSelection(book._id)">
                                     {{ book.title }} ({{ book.price | currency }})
                                 </label>
                             }

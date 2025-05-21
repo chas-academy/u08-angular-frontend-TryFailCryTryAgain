@@ -85,6 +85,19 @@ export class OrderService {
     );
   }
 
+  updateOrder(order: OrderModel): Observable<OrderModel> {
+    return this.http.put<OrderModel>(`${this.ordersUrl}${order._id}`, order).pipe(
+      tap(updatedOrder => {
+        const currentOrders = this.ordersSubject.value;
+        const updatedOrders = currentOrders.map((o: OrderModel) => 
+          o._id === updatedOrder._id ? updatedOrder : o
+        );
+        this.ordersSubject.next(updatedOrders);
+        this.cacheData(updatedOrders);
+      })
+    );
+  }
+
   private loadInitialData(): void {
     const cachedData = localStorage.getItem(this.cacheKey);
     if (cachedData) {
