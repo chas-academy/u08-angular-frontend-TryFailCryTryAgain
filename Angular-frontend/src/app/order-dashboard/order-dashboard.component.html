@@ -28,17 +28,17 @@
                     @for (order of orders; track order._id) {
                     <tr>
                         <td>{{ order.userId }}</td>
-                        <td>{{ order.bookIds.join(', ') }}</td>
+                        <td>{{ order.bookIds?.join(', ') || 'No Books' }}</td>
                         <td>{{ order.totalAmount | currency }}</td>
                         <td>{{ order.orderDate | date }}</td>
                         <td>{{ order.status }}</td>
                         <td>
-                            <button class="edit"  (click)="openEditOrder(order)"> <!-- (click)="displaySelectedOrder(order)" -->
+                            <button class="edit"  (click)="openEditOrder(order)">
                                 Edit
                             </button>
                         </td>
                         <td>
-                            <button class="delete"> <!-- (click)="onDeleteOrder(order._id)" -->
+                            <button class="delete" (click)="onDeleteOrder(order._id)">
                                 Delete
                             </button>
                         </td>

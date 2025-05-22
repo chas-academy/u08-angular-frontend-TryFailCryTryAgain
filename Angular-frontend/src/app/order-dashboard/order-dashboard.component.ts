@@ -1,13 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
 import { OrderService } from '../api-calls-order.service';
 import { OrderModel } from '../order-model';
-import { UserModel } from '../user-model';
-import { BookModel } from '../book-model';
 import { BookItem } from '../book-item-model';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, FormsModule, FormControl, Form } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, FormsModule, FormControl } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Observable } from 'rxjs';
 import { FormArray } from '@angular/forms';
 
 @Component({
@@ -104,11 +101,20 @@ export class OrderDashboardComponent {
         };
         this.selectedBookItems.set(updatedItems);
 
-        const bookIdsArray = this.createForm.get('bookIds') as FormArray<FormControl<string>>;
-        const removeIndex = bookIdsArray.value.lastIndexOf(bookId);
-        if (removeIndex > -1) {
-          bookIdsArray.removeAt(removeIndex);
+        if (this.createNewOrder()) {
+          const bookIdsArray = this.createForm.get('bookIds') as FormArray<FormControl<string>>;
+          const removeIndex = bookIdsArray.value.lastIndexOf(bookId);
+          if (removeIndex > -1) {
+            bookIdsArray.removeAt(removeIndex);
+          }
+        } else {
+          const bookIdsArray = this.editForm.get('bookIds') as FormArray<FormControl<string>>;
+          const removeIndex = bookIdsArray.value.lastIndexOf(bookId);
+          if (removeIndex > -1) {
+            bookIdsArray.removeAt(removeIndex);
+          }
         }
+
       } else {
         this.removeBook(bookId);
       }
@@ -123,8 +129,15 @@ export class OrderDashboardComponent {
     );
     this.selectedBookItems.set(updateItems);
 
-    const bookIdsArray = this.createForm.get('bookIds') as FormArray<FormControl<string>>;
-    bookIdsArray.push(this.fb.nonNullable.control(bookId));
+    if (this.createNewOrder()) {
+      const bookIdsArray = this.createForm.get('bookIds') as FormArray<FormControl<string>>;
+      bookIdsArray.push(this.fb.nonNullable.control(bookId));
+    } else {
+      const bookIdsArray = this.editForm.get('bookIds') as FormArray<FormControl<string>>;
+      bookIdsArray.push(this.fb.nonNullable.control(bookId));
+    }
+    
+    
   }
 
   removeBook(bookId: string) {
@@ -152,6 +165,7 @@ export class OrderDashboardComponent {
         next: () => {
           this.createForm.reset();
           this.createNewOrder.set(false);
+          this.refreshOrders();
         },
         error: (err) => console.error('Error creating order: ', err)
       });
@@ -163,26 +177,21 @@ export class OrderDashboardComponent {
     this.selectedOrder.set(order);
     this.editExistingOrder.set(true);
     
-    // Pre-populate form with existing data
     this.editForm.patchValue({
       userId: order.userId
     });
 
-    // Clear and repopulate bookIds array
     const bookIdsArray = this.editForm.get('bookIds') as FormArray<FormControl<string>>;
     bookIdsArray.clear();
     
-    // For each book in order, add to form array
     order.bookIds.forEach(bookId => {
       bookIdsArray.push(this.fb.nonNullable.control(bookId));
     });
 
-    // Initialize selectedBookItems with quantities
     const itemsWithQuantities = this.calculateQuantities(order.bookIds);
     this.selectedBookItems.set(itemsWithQuantities);
   }
 
-  // Get user name for display
   getSelectedUserName(): string {
     const userId = this.selectedOrder()?.userId;
     const user = this.users().find(u => u._id === userId);
@@ -203,7 +212,6 @@ export class OrderDashboardComponent {
     }));
   }
 
-  // Cancel edit mode
   cancelEdit() {
     this.editExistingOrder.set(false);
     this.selectedOrder.set(null);
@@ -211,24 +219,44 @@ export class OrderDashboardComponent {
     this.selectedBookItems.set([]);
   }
 
-  // Submit edited order
   onEditSubmit() {
     if (this.editForm.valid) {
       const formValue = this.editForm.getRawValue();
       const orderId = this.selectedOrder()?._id;
+
+      console.log(orderId);
+      const books = this.selectedBookItems();
+      console.log(books);
       
       if (orderId) {
         this.orderService.updateOrder(orderId, {
-          userId: formValue.userId,
-          bookIds: formValue.bookIds
-        }).subscribe({
-          next: () => {
-            this.editExistingOrder.set(false);
-            this.selectedOrder.set(null);
-          },
-          error: (err) => console.error('Error updating order:', err)
+        userId: formValue.userId,
+        bookIds: formValue.bookIds
+      }).subscribe({
+        next: () => {
+        this.editExistingOrder.set(false);
+        this.selectedOrder.set(null);
+        this.refreshOrders();
+      },
+        error: (err) => console.error('Error updating order:', err)
         });
       }
+    }
+  }
+
+  refreshOrders() {
+    this.orderService.refreshOrders().subscribe({
+      next: () => console.log('Order refreshed Successfully!'),
+      error: (err) => console.error('Refresh failed:', err)
+    });
+  }
+
+  onDeleteOrder(orderId: string) {
+    if (confirm('Are you sure you want to delete this order?')) {
+      this.orderService.deleteOrder(orderId).subscribe({
+        next: () => this.refreshOrders(),
+        error: (err) => console.error('Error deleting this order: ', err)
+      });
     }
   }
 

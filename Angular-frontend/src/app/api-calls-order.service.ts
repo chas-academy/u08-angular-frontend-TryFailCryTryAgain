@@ -94,4 +94,25 @@ export class OrderService {
     );
   }
 
+  refreshOrders(): Observable<OrderModel[]> {
+    return this.http.get<OrderModel[]>(this.orderUrl).pipe(
+      tap((orders: OrderModel[]) => {
+        this.ordersSubject.next(orders);
+        this.cacheData(orders);
+      })
+    );
+  }
+
+  deleteOrder(orderId: string): Observable<any> {
+
+    const deleteUrl = `${this.orderUrl}${orderId}`;    
+    return this.http.delete(deleteUrl).pipe(
+      tap(() => {
+        const currentOrders = this.ordersSubject.value;
+        const updatedOrders = currentOrders.filter(order => order._id !== orderId);
+        this.ordersSubject.next(updatedOrders);
+        this.cacheData(updatedOrders);
+      })
+    );
+  }
 }
