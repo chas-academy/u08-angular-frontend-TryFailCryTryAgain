@@ -58,8 +58,8 @@
     }
 }
 
-.main_button {
-    background-color: #2980b9;
+button {
+    background-color: #3498db;
     color: white;
     border: none;
     padding: 0.5rem 1rem;
@@ -67,7 +67,7 @@
     cursor: pointer;
     font-weight: 500;
     transition: background-color 0.3s ease;
-    min-width: 44px;
+    min-width: 44px; // Better touch targets
     min-height: 44px;
 
     &:hover {
@@ -88,32 +88,6 @@
 .api_outlet {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-
-    .edit {
-      background-color: #f39c12;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
-      min-width: 44px;
-      min-height: 44px;
-    }
-
-    .delete {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
-      min-width: 44px;
-      min-height: 44px;
-    }
 }
 
 table {
@@ -152,393 +126,298 @@ tr:hover {
     background-color: #f8fafc;
 }
 
-.create-form {
+.create_form{
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
-  width: 100%;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
   display: flex;
-  justify-content: center;
   align-items: center;
-  backdrop-filter: blur(4px);
-  transition: opacity 0.3s ease;
+  justify-content: center;
+  z-index: 1000;
 
   .form-container {
-    background-color: #f8f9fa;
+    background: white;
     padding: 2rem;
-    border-radius: 12px;
-    width: 50%;
+    border-radius: 8px;
+    width: 90%;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.3s ease-out;
 
     h3 {
-      color: #2c3e50;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: 600;
+      margin-top: 0;
+      color: #333;
     }
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
 
     .form-group {
-      margin-bottom: 1.5rem;
-
-      label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #34495e;
-      }
-
-      select {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        background-color: white;
-        font-size: 1rem;
-        transition: border-color 0.2s;
-
-        &:focus {
-          outline: none;
-          border-color: #3498db;
-          box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
-      }
+      flex: 1;
     }
+  }
 
-    .books-selection-container {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
 
-      select {
-        flex: 1;
+    button {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &.cancel {
+        background: #c0392b;
+        border: 1px solid #ddd;
       }
 
-      .add-book {
-        padding: 0.5rem 1rem;
-        background-color: #2980b9;
+      &.save {
+        background: #4CAF50;
         color: white;
         border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-
-        &:hover {
-          background-color: #2980b9;
-        }
 
         &:disabled {
-          background-color: #95a5a6;
+          background: #cccccc;
           cursor: not-allowed;
-        }
-      }
-    }
-
-    .selected-books-list {
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 0.5rem;
-      max-height: 200px;
-      overflow-y: auto;
-      background-color: white;
-
-      .book-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem;
-        border-bottom: 1px solid #eee;
-        transition: background-color 0.2s;
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        &:hover {
-          background-color: #f5f5f5;
-        }
-
-        .quantity-controls {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-
-          button {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            border-radius: 4px;
-            background-color: #2980b9;
-            cursor: pointer;
-            transition: all 0.2s;
-
-            &:hover {
-              background-color: #3498db;
-            }
-
-            &.remove-btn {
-              background-color: #e74c3c;
-              color: white;
-
-              &:hover {
-                background-color: #c0392b;
-              }
-            }
-          }
-
-          span {
-            min-width: 20px;
-            text-align: center;
-          }
-        }
-      }
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 1.5rem;
-
-      button {
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 6px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &.cancel {
-          background-color: #e74c3c;
-          color: white;
-
-          &:hover {
-            background-color: #c0392b;
-          }
-        }
-
-        &.save {
-          background-color: #2ecc71;
-          color: white;
-
-          &:hover {
-            background-color: #27ae60;
-          }
-
-          &:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-          }
         }
       }
     }
   }
 }
 
-.edit-form {
+.edit_form {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 1000;
   backdrop-filter: blur(4px);
-  transition: opacity 0.3s ease;
-  
+  animation: fadeIn 0.3s ease-out;
+
   .form-container {
-    background-color: #f8f9fa;
-    padding: 2rem;
+    background: white;
+    padding: 2.5rem;
     border-radius: 12px;
-    width: 50%;
-    max-width: 600px;
+    width: 90%;
+    max-width: 700px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 
     h3 {
+      margin-top: 0;
       color: #2c3e50;
-      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
       text-align: center;
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-
-    .form-group {
       margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+  }
 
-      label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #34495e;
-      }
+  .form-group {
+    margin-bottom: 1.5rem;
 
-      select {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        background-color: white;
-        font-size: 1rem;
-        transition: border-color 0.2s;
+    label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: #34495e;
+      font-size: 1rem;
+    }
 
-        &:focus {
-          outline: none;
-          border-color: #3498db;
-          box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #dfe6e9;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+
+      &:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        outline: none;
       }
     }
+  }
 
     .books-selection-container {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
 
-      select {
-        flex: 1;
-      }
-
-      .add-book {
-        padding: 0.5rem 1rem;
-        background-color: #2980b9;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-
-        &:hover {
-          background-color: #2980b9;
-        }
-
-        &:disabled {
-          background-color: #95a5a6;
-          cursor: not-allowed;
-        }
-      }
-    }
-
-    .selected-books-list {
-      border: 1px solid #e0e0e0;
+    select {
+      flex: 1;
+      padding: 0.75rem;
       border-radius: 8px;
-      padding: 0.5rem;
-      max-height: 200px;
-      overflow-y: auto;
-      background-color: white;
-
-      .book-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem;
-        border-bottom: 1px solid #eee;
-        transition: background-color 0.2s;
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        &:hover {
-          background-color: #f5f5f5;
-        }
-
-        .quantity-controls {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-
-          button {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            border-radius: 4px;
-            background-color: #2980b9;
-            cursor: pointer;
-            transition: all 0.2s;
-
-            &:hover {
-              background-color: #3498db;
-            }
-
-            &.remove-btn {
-              background-color: #e74c3c;
-              color: white;
-
-              &:hover {
-                background-color: #c0392b;
-              }
-            }
-          }
-
-          span {
-            min-width: 20px;
-            text-align: center;
-          }
-        }
-      }
+      border: 2px solid #dfe6e9;
     }
 
-    .form-actions {
+    button {
+      padding: 0 1.5rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #2980b9;
+      }
+
+      &:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .selected-books-list {
+    border: 2px solid #dfe6e9;
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+  }
+
+  .book-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .quantity-controls {
       display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 1.5rem;
+      align-items: center;
+      gap: 0.75rem;
 
       button {
-        padding: 0.75rem 1.5rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: 50%;
         border: none;
-        border-radius: 6px;
-        font-weight: 500;
+        background-color: #3498db;
+        color: white;
         cursor: pointer;
         transition: all 0.2s;
 
-        &.cancel {
-          background-color: #e74c3c;
-          color: white;
-
-          &:hover {
-            background-color: #c0392b;
-          }
+        &:hover {
+          background-color: #2980b9;
+          transform: scale(1.1);
         }
 
-        &.save {
-          background-color: #2ecc71;
-          color: white;
+        &:active {
+          transform: scale(0.95);
+        }
+      }
 
-          &:hover {
-            background-color: #27ae60;
-          }
+      .remove-btn {
+        background-color: #e74c3c;
+        margin-left: 1rem;
 
-          &:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-          }
+        &:hover {
+          background-color: #c0392b;
+        }
+      }
+    }
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+
+    .form-group {
+      flex: 1;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+
+      &.cancel {
+        background: #e74c3c;
+        color: white;
+        border: none;
+
+        &:hover {
+          background: #c0392b;
+        }
+      }
+
+      &.save {
+        background: #4CAF50;
+        color: white;
+        border: none;
+
+        &:hover {
+          background: #27ae60;
+        }
+
+        &:disabled {
+          background: #95a5a6;
+          cursor: not-allowed;
         }
       }
     }
   }
 }
 
-
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 /* Mobile-specific table styles */
 @media (max-width: 768px) {

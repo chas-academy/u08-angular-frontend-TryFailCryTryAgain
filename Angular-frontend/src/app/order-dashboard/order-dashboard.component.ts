@@ -3,12 +3,15 @@ import { OrderService } from '../api-calls-order.service';
 import { OrderModel } from '../order-model';
 import { UserModel } from '../user-model';
 import { BookModel } from '../book-model';
-import { BookItem } from '../book-item-model';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, FormsModule, FormControl, Form } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, FormsModule, FormControl } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
-import { FormArray } from '@angular/forms';
+
+interface BookItem {
+  bookId: string;
+  quantity: number;
+}
 
 @Component({
   selector: 'app-order-dashboard',
@@ -25,11 +28,12 @@ export class OrderDashboardComponent {
   private orderService = inject(OrderService);
   private fb = inject(FormBuilder);
 
-  editExistingOrder = signal(false);
-  createNewOrder = signal(false);
-  selectedBookItems = signal<BookItem[]>([]);
-  bookSelectorControl = new FormControl<string>('');
   selectedOrder = signal<OrderModel | null>(null);
+  createSelectedOrder = signal(false);
+  selectedBookId = '';
+  bookSelectorControl = new FormControl<string>('');
+  selectedBookItems = signal<BookItem[]>([]);
+  selectedBooks = signal<string[]>([]);
 
   orders = toSignal(this.orderService.orders$, { initialValue: [] });
   users = toSignal(this.orderService.users$, { initialValue: [] });
@@ -37,16 +41,76 @@ export class OrderDashboardComponent {
 
   createForm = this.fb.nonNullable.group({
     userId: ['', Validators.required],
-    bookIds: this.fb.nonNullable.array<FormControl<string>>([], [Validators.required, Validators.minLength(1)])
+    bookIds: this.fb.nonNullable.array<string>([], Validators.required),
+    totalAmount: [0, [Validators.required, Validators.min(0)]],
+    orderDate: ['', Validators.required],
+    status: ['Pending', Validators.required]
   });
 
   editForm = this.fb.nonNullable.group({
     userId: ['', Validators.required],
-    bookIds: this.fb.nonNullable.array<FormControl<string>>([], [Validators.required, Validators.minLength(1)])
+    bookItems: this.fb.nonNullable.array<BookItem>([], [Validators.required, Validators.minLength(1)])
   });
 
   constructor() {
-    this.orderService.fetchOrders().subscribe();
+    this.orderService.getOrders().subscribe();
+  }
+
+  onDeleteOrder(orderId: string) {
+    if (confirm('Are you sure you want to delete this order?')) {
+      this.orderService.deleteOrder(orderId).subscribe({
+        next: () => this.refreshOrders(),
+        error: (err) => console.error('Error deleting order:', err)
+      });
+    }
+  }
+
+  toggleCreateForm() {
+    this.createSelectedOrder.update(val => !val);
+    if (!this.createSelectedOrder()) {
+      this.createForm.reset();
+      this.createForm.patchValue({ status: 'Pending' });
+    }
+  }
+
+  displaySelectedOrder(order: OrderModel) {
+    this.selectedOrder.set({ ...order });
+    
+    // Convert bookIds array to bookItems format
+    const bookItems = this.convertBookIdsToItems(order.bookIds);
+
+    this.editForm.reset();
+    
+    this.editForm.patchValue({
+      userId: order.userId,
+      bookItems
+    });
+    
+    this.selectedBookItems.set(bookItems);
+
+    this.editForm.markAsDirty();
+  }
+
+  cancelEdit() {
+    this.selectedOrder.set(null);
+  }
+
+  private convertBookIdsToItems(bookIds: string[]): BookItem[] {
+    const countMap = new Map<string, number>();
+    bookIds.forEach(id => {
+      countMap.set(id, (countMap.get(id) || 0) + 1);
+    });
+    
+    return Array.from(countMap.entries()).map(([bookId, quantity]) => ({
+      bookId,
+      quantity
+    }));
+  }
+
+  private convertItemsToBookIds(items: BookItem[]): string[] {
+    return items.flatMap(item => 
+      Array(item.quantity).fill(item.bookId)
+    );
   }
 
   getSelectedBookItems(): BookItem[] {
@@ -58,37 +122,39 @@ export class OrderDashboardComponent {
     return book ? `${book.title} (${book.price})` : 'Unknown Book';
   }
 
-  toggleCreateForm() {
-    this.createNewOrder.update(val => !val);
-    if (!this.createNewOrder()) {
-      this.createForm.reset();
-    }
+  addBookToOrder() {
+      const bookId = this.bookSelectorControl.value;
+      if (!bookId) return;
+
+      const currentItems = this.selectedBookItems();
+      const existingItemIndex = currentItems.findIndex(item => item.bookId === bookId);
+
+      if (existingItemIndex >= 0) {
+          const updatedItems = [...currentItems];
+          updatedItems[existingItemIndex] = {
+              ...updatedItems[existingItemIndex],
+              quantity: updatedItems[existingItemIndex].quantity + 1
+          };
+          this.selectedBookItems.set(updatedItems);
+      } else {
+          this.selectedBookItems.set([
+              ...currentItems,
+              { bookId, quantity: 1 }
+          ]);
+      }
+
+      this.updateFormBookItems();
+      this.bookSelectorControl.reset();
   }
 
-  addBookToOrder(selectedBookId: string) {
-
-    const bookId = selectedBookId;
-    if (!bookId) return;
-
-    const bookIdsArray = this.createForm.get('bookIds') as FormArray<FormControl<string>>;
-    const currentItems = this.selectedBookItems();
-    const isExistingInArray = currentItems.findIndex(item => item.bookId === bookId);
-
-    if (isExistingInArray >= 0) {
-      const updatedItems = [...currentItems];
-      updatedItems[isExistingInArray] = {
-        ...updatedItems[isExistingInArray],
-        quantity: updatedItems[isExistingInArray].quantity + 1
-      };
-      this.selectedBookItems.set(updatedItems);
-      bookIdsArray.push(this.fb.nonNullable.control(bookId));
-    } else {
-      this.selectedBookItems.set([
-        ...currentItems,
-        { bookId, quantity: 1 }
-      ]);
-      bookIdsArray.push(this.fb.nonNullable.control(bookId));
-    }
+  increaseBookQuantity(bookId: string) {
+    const updatedItems = this.selectedBookItems().map(item => 
+      item.bookId === bookId 
+        ? { ...item, quantity: item.quantity + 1 } 
+        : item
+    );
+    this.selectedBookItems.set(updatedItems);
+    this.updateFormBookItems();
   }
 
   decreaseBookQuantity(bookId: string) {
@@ -97,139 +163,132 @@ export class OrderDashboardComponent {
     
     if (itemIndex >= 0) {
       if (currentItems[itemIndex].quantity > 1) {
+        // Decrease quantity if more than 1
         const updatedItems = [...currentItems];
         updatedItems[itemIndex] = {
           ...updatedItems[itemIndex],
           quantity: updatedItems[itemIndex].quantity - 1
         };
         this.selectedBookItems.set(updatedItems);
-
-        const bookIdsArray = this.createForm.get('bookIds') as FormArray<FormControl<string>>;
-        const removeIndex = bookIdsArray.value.lastIndexOf(bookId);
-        if (removeIndex > -1) {
-          bookIdsArray.removeAt(removeIndex);
-        }
       } else {
+        // Remove if quantity would become 0
         this.removeBook(bookId);
+        return;
       }
     }
-  }
-
-  increaseBookQuantity(bookId: string) {
-
-    const updateItems = this.selectedBookItems().map(item => item.bookId === bookId ? {
-      ...item, quantity: item.quantity + 1
-      } : item
-    );
-    this.selectedBookItems.set(updateItems);
-
-    const bookIdsArray = this.createForm.get('bookIds') as FormArray<FormControl<string>>;
-    bookIdsArray.push(this.fb.nonNullable.control(bookId));
+    
+    this.updateFormBookItems();
   }
 
   removeBook(bookId: string) {
-
-
-    const bookIdsArray = this.createForm.get('bookIds') as FormArray<FormControl<string>>;
-    const newArray = bookIdsArray.value.filter(id => id !== bookId);
-    bookIdsArray.clear();
-    newArray.forEach(id => bookIdsArray.push(this.fb.nonNullable.control(id)));
-
     const updatedItems = this.selectedBookItems().filter(item => item.bookId !== bookId);
     this.selectedBookItems.set(updatedItems);
+    this.updateFormBookItems();
+  }
 
+  private updateFormBookItems() {
+    const bookItems = this.selectedBookItems();
+    const bookItemsControl = this.editForm.get('bookItems');
+    
+    // Completely replace the array
+    bookItemsControl?.setValue(bookItems);
+    
+    // Manually update validity
+    bookItemsControl?.updateValueAndValidity();
+    this.editForm.updateValueAndValidity();
+  }
+
+  onEditSubmit() {
+    const selectedOrder = this.selectedOrder();
+    if (this.editForm.valid && selectedOrder) {
+      const formValue = this.editForm.getRawValue();
+      const bookIds = this.convertItemsToBookIds(formValue.bookItems);
+      
+      const updatedOrder = {
+        ...selectedOrder,
+        userId: formValue.userId,
+        bookIds,
+        totalAmount: this.calculateTotal(bookIds),
+        orderDate: new Date().toISOString(),
+        status: 'Pending'
+      };
+
+      this.orderService.updateOrder(updatedOrder).subscribe({
+        next: () => {
+          this.selectedOrder.set(null);
+          this.refreshOrders();
+        },
+        error: (err) => console.error('Error updating order:', err)
+      });
+    } else {
+      console.log('Form is invalid:', this.editForm.errors);
+      this.editForm.markAllAsTouched();
+    }
+  }
+
+  updateOrder(order: OrderModel): Observable<OrderModel> {
+    return this.orderService.updateOrder(order); // Delegate to OrderService
+  }
+
+  toggleCreateFormBookSelection(bookId: string) {
+    const bookIdsControl = this.createForm.get('bookIds');
+    if (!bookIdsControl) return;
+
+    const currentBooks = bookIdsControl.value as string[] || [];
+
+    if (currentBooks.includes(bookId)) {
+      bookIdsControl.patchValue(
+        currentBooks.filter(id => id !== bookId)
+      );
+    } else {
+      bookIdsControl.patchValue(
+        [...currentBooks, bookId]
+      );
+    }
+
+    this.onBooksChange(bookIdsControl.value as string[], 'create');
+  }
+
+  calculateTotal(bookIds: string[]): number {
+    const books = this.books();
+    return bookIds.reduce((total, bookId) => {
+      const book = books.find(b => b._id === bookId);
+      return total + (book?.price || 0);
+    }, 0);
   }
 
   onCreateSubmit() {
-
     if (this.createForm.valid) {
       const formValue = this.createForm.getRawValue();
+      const orderData = {
+        ...formValue,
+        orderDate: new Date(formValue.orderDate).toISOString(),
+        bookIds: formValue.bookIds
+      };
 
-      this.orderService.createOrder({
-        userId: formValue.userId,
-        bookIds: formValue.bookIds,
-      }).subscribe({
+      this.orderService.createOrder(orderData).subscribe({
         next: () => {
           this.createForm.reset();
-          this.createNewOrder.set(false);
+          this.createForm.patchValue({ status: 'Pending' });
+          this.createSelectedOrder.set(false);
+          this.refreshOrders();
         },
-        error: (err) => console.error('Error creating order: ', err)
+        error: (err) => console.error('Error creating order:', err)
       });
     }
   }
 
-  openEditOrder(order: OrderModel) {
-    console.log(order);
-    this.selectedOrder.set(order);
-    this.editExistingOrder.set(true);
-    
-    // Pre-populate form with existing data
-    this.editForm.patchValue({
-      userId: order.userId
-    });
-
-    // Clear and repopulate bookIds array
-    const bookIdsArray = this.editForm.get('bookIds') as FormArray<FormControl<string>>;
-    bookIdsArray.clear();
-    
-    // For each book in order, add to form array
-    order.bookIds.forEach(bookId => {
-      bookIdsArray.push(this.fb.nonNullable.control(bookId));
-    });
-
-    // Initialize selectedBookItems with quantities
-    const itemsWithQuantities = this.calculateQuantities(order.bookIds);
-    this.selectedBookItems.set(itemsWithQuantities);
-  }
-
-  // Get user name for display
-  getSelectedUserName(): string {
-    const userId = this.selectedOrder()?.userId;
-    const user = this.users().find(u => u._id === userId);
-    return user ? `${user.first_name} ${user.last_name}` : 'Unknown User';
-  }
-
-  private calculateQuantities(bookIds: string[]): BookItem[] {
-    if (!bookIds || bookIds.length === 0) return [];
-    
-    const quantityMap = bookIds.reduce((acc, id) => {
-      acc[id] = (acc[id] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return Object.entries(quantityMap).map(([bookId, quantity]) => ({
-      bookId,
-      quantity
-    }));
-  }
-
-  // Cancel edit mode
-  cancelEdit() {
-    this.editExistingOrder.set(false);
-    this.selectedOrder.set(null);
-    this.editForm.reset();
-    this.selectedBookItems.set([]);
-  }
-
-  // Submit edited order
-  onEditSubmit() {
-    if (this.editForm.valid) {
-      const formValue = this.editForm.getRawValue();
-      const orderId = this.selectedOrder()?._id;
-      
-      if (orderId) {
-        this.orderService.updateOrder(orderId, {
-          userId: formValue.userId,
-          bookIds: formValue.bookIds
-        }).subscribe({
-          next: () => {
-            this.editExistingOrder.set(false);
-            this.selectedOrder.set(null);
-          },
-          error: (err) => console.error('Error updating order:', err)
-        });
-      }
+  onBooksChange(bookIds: string[], form: 'create' | 'edit') {
+    const total = this.calculateTotal(bookIds);
+    if (form === 'create') {
+      this.createForm.patchValue({ totalAmount: total });
     }
   }
 
+  refreshOrders() {
+    this.orderService.refreshOrders().subscribe({
+      next: () => console.log('Orders refreshed successfully'),
+      error: (err) => console.error('Refresh failed:', err)
+    });
+  }
 }

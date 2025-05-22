@@ -2,12 +2,10 @@
     <span class="title_section">
         <h2>Orders</h2>
         <span class="button-container">
-            <button class="main_button" (click)="toggleCreateForm()">
-                Creates
+            <button (click)="toggleCreateForm()">
+                {{ createSelectedOrder() ? 'Cancel' : 'Create' }}
             </button>
-            <button class="main_button" > <!-- (click)="refreshOrders()" -->
-                Refresh
-            </button>
+            <button (click)="refreshOrders()">Refresh</button>
         </span>
     </span>
     <div class="api_outlet">
@@ -26,116 +24,44 @@
             <tbody>
                 @if (orders(); as orders) {
                     @for (order of orders; track order._id) {
-                    <tr>
-                        <td>{{ order.userId }}</td>
-                        <td>{{ order.bookIds.join(', ') }}</td>
-                        <td>{{ order.totalAmount | currency }}</td>
-                        <td>{{ order.orderDate | date }}</td>
-                        <td>{{ order.status }}</td>
-                        <td>
-                            <button class="edit"  (click)="openEditOrder(order)"> <!-- (click)="displaySelectedOrder(order)" -->
-                                Edit
-                            </button>
-                        </td>
-                        <td>
-                            <button class="delete"> <!-- (click)="onDeleteOrder(order._id)" -->
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                    } @empty {
                         <tr>
-                            <td colspan="7">No order found</td>
+                            <td>{{ order.userId }}</td>
+                            <td>{{ order.bookIds.join(', ') }}</td>
+                            <td>{{ order.totalAmount | currency }}</td>
+                            <td>{{ order.orderDate | date }}</td>
+                            <td>{{ order.status }}</td>
+                            <td>
+                                <button class="edit" (click)="displaySelectedOrder(order)">
+                                    Edit
+                                </button>
+                            </td>
+                            <td>
+                                <button class="delete" (click)="onDeleteOrder(order._id)">
+                                    Delete
+                                </button>
+                            </td>
                         </tr>
+                    } @empty {
+                        <tr><td colspan="7">No orders found</td></tr>
                     }
                 }
             </tbody>
         </table>
     </div>
 
-    <!-- Create a new order form -->
-
-    @if (createNewOrder()) {
-    <section class="create-form">
-        <div class="form-container">
-            <h3>Create new Order</h3>
-            <form [formGroup]="createForm" (ngSubmit)="onCreateSubmit()"> <!--  -->
-                <div class="form-group">
-                    <label for="create-userId">User</label>
-                    <select id="create-userId" formControlName="userId" required> <!--  -->
-                        <option value="">Select a user</option>
-                        @for (user of users(); track user._id) {
-                            <option [value]="user._id">
-                                {{ user.first_name}} {{ user.last_name }} ({{ user.email }})
-                            </option>
-                        }
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Books</label>
-                    <div class="books-selection-container">
-                        <select #bookSelect id="book-selector"> <!-- [fromControl]="bookSelectorControl"-->
-                            <option value="">Select a book</option>
-                            @for (book of books(); track book._id) {
-                                <option [value]="book._id">{{ book.title }} ({{ book.price | currency }})</option>
-                            }
-                        </select>
-                        <button class="add-book" type="button" (click)="addBookToOrder(bookSelect.value)">Add Book</button> <!-- [disabled]="!bookSelectorControl.value" -->
-                    </div>
-
-                    <div class="selected-books-list">
-                        @for (selectedItem of getSelectedBookItems(); track selectedItem.bookId) {
-                            <div class="book-item">
-                                <span>{{ getBookTitle(selectedItem.bookId) }}</span>
-                                <div class="quantity-controls">
-                                    <button class="main_button" type="button" (click)="decreaseBookQuantity(selectedItem.bookId)">-</button>
-                                    <span>{{ selectedItem.quantity }}</span>
-                                    <button class="main_button"  type="button" (click)="increaseBookQuantity(selectedItem.bookId)">+</button>
-                                    <button type="button" class="remove-btn" (click)="removeBook(selectedItem.bookId)">×</button>
-                                </div>
-                            </div>
-                        } @empty {
-                            <div class="book-item">
-                                <span>No Books Selected</span>
-                            </div>
-                        }
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" (click)="toggleCreateForm()" class="cancel">Cancel</button>
-                        <!-- <div *ngIf="!createForm.valid" class="error-message">
-                            Form is invalid. Errors: {{ createForm.errors | json }}
-                            User valid: {{ createForm.get('userId')?.valid }}
-                            Books valid: {{ createForm.get('bookItems')?.valid }}
-                        </div> -->
-                        <button type="submit" class="save" [disabled]="!createForm.valid">Submit Changes</button> <!--    [disabled]="!createForm.valid"-->
-                    </div>
-                </div>
-            </form>
-        </div>
-    </section>
-    }
-
-
-    <!-- Edit an existing form -->
-    @if (editExistingOrder()) {
-        <section class="edit-form">
+    @if (selectedOrder()) {
+        <section class="edit_form">
             <div class="form-container">
-                <h3>Edit Existing Order</h3>
+                <h3>Edit Order</h3>
                 <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
                     <div class="form-group">
                         <label for="edit-userId">User</label>
-                        <select id="edit-userId" formControlName="userId" required>
-                            <option [value]="selectedOrder()?.userId" selected>
-                                {{ getSelectedUserName() }}
-                            </option>
+                        <select id="edit-userId" formControlName="userId" required ngDefaultControl>
+                            <option value="">Select a user</option>
                             @for (user of users(); track user._id) {
-                                @if (user._id !== selectedOrder()?.userId) {
-                                    <option [value]="user._id">
-                                        {{ user.first_name}} {{ user.last_name }} ({{ user.email }})
-                                    </option>
-                                }
+                                <option [value]="user._id">
+                                    {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
+                                </option>
                             }
                         </select>
                     </div>
@@ -143,38 +69,37 @@
                     <div class="form-group">
                         <label>Books</label>
                         <div class="books-selection-container">
-                            <select #bookSelect id="book-selector">
+                            <select id="book-selector" [formControl]="bookSelectorControl">
                                 <option value="">Select a book</option>
                                 @for (book of books(); track book._id) {
                                     <option [value]="book._id">{{ book.title }} ({{ book.price | currency }})</option>
                                 }
                             </select>
-                            <button class="add-book" type="button" (click)="addBookToOrder(bookSelect.value)">Add Book</button>
+                            <button type="button" (click)="addBookToOrder()" [disabled]="!bookSelectorControl.value">Add Book</button>
                         </div>
 
                         <div class="selected-books-list">
-                        @if (getSelectedBookItems()) {
-                            @for (selectedItem of getSelectedBookItems(); track selectedItem.bookId) {
+                            @for (item of getSelectedBookItems(); track item.bookId) {
                                 <div class="book-item">
-                                    <span>{{ getBookTitle(selectedItem.bookId) }}</span>
+                                    <span>{{ getBookTitle(item.bookId) }}</span>
                                     <div class="quantity-controls">
-                                        <button class="main_button" type="button" (click)="decreaseBookQuantity(selectedItem.bookId)">-</button>
-                                        <span>{{ selectedItem.quantity }}</span>
-                                        <button class="main_button" type="button" (click)="increaseBookQuantity(selectedItem.bookId)">+</button>
-                                        <button type="button" class="remove-btn" (click)="removeBook(selectedItem.bookId)">×</button>
+                                        <button type="button" (click)="decreaseBookQuantity(item.bookId)">-</button>
+                                        <span>{{ item.quantity }}</span>
+                                        <button type="button" (click)="increaseBookQuantity(item.bookId)">+</button>
+                                        <button type="button" (click)="removeBook(item.bookId)" class="remove-btn">×</button>
                                     </div>
                                 </div>
-                            } @empty {
-                                <div class="book-item">
-                                    <span>No Books Selected</span>
-                                </div>
                             }
-                        }
                         </div>
                     </div>
 
                     <div class="form-actions">
                         <button type="button" (click)="cancelEdit()" class="cancel">Cancel</button>
+                        <div *ngIf="!editForm.valid" class="error-message">
+                            Form is invalid. Errors: {{ editForm.errors | json }}
+                            User valid: {{ editForm.get('userId')?.valid }}
+                            Books valid: {{ editForm.get('bookItems')?.valid }}
+                        </div>
                         <button type="submit" class="save" [disabled]="!editForm.valid">Save Changes</button>
                     </div>
                 </form>
@@ -182,6 +107,63 @@
         </section>
     }
 
-    
+    @if (createSelectedOrder()) {
+        <section class="create_form">
+            <div class="form-container">
+                <h3>Create Order</h3>
+                <form [formGroup]="createForm" (ngSubmit)="onCreateSubmit()">
+                    <div class="form-group">
+                        <label for="create-userId">User</label>
+                        <select id="create-userId" formControlName="userId" required>
+                            <option value="">Select a user</option>
+                            @for (user of users(); track user._id) {
+                                <option [value]="user._id">{{ user.first_name }} {{ user.last_name }} ({{ user.email }})</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Books</label>
+                        <div class="books-checkbox-container">
+                            @for (book of books(); track book._id) {
+                                <label>
+                                    <input type="checkbox" 
+                                           [value]="book._id"
+                                           (change)="toggleCreateFormBookSelection(book._id)">
+                                    {{ book.title }} ({{ book.price | currency }})
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-totalAmount">Total Amount</label>
+                        <input type="number" id="create-totalAmount" formControlName="totalAmount" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-orderDate">Order Date</label>
+                        <input type="date" id="create-orderDate" formControlName="orderDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="create-status">Status</label>
+                        <select id="create-status" formControlName="status" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" (click)="toggleCreateForm()" class="cancel">Cancel</button>
+                        <button type="submit" class="save" [disabled]="!createForm.valid">Create Order</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    }
 </section>
 <br />
