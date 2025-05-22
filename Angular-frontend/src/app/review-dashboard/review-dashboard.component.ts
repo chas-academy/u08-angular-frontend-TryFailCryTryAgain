@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { take } from 'rxjs';
+import { UserService } from '../api-calls-users.service';
+import { BookService } from '../book.service';
 
 @Component({
   selector: 'app-review-dashboard',
@@ -18,12 +20,16 @@ import { take } from 'rxjs';
 })
 export class ReviewDashboardComponent {
   private reviewService = inject(ReviewService);
+  private userService = inject(UserService);
+  private bookService = inject(BookService);
   private fb = inject(FormBuilder);
 
   selectedReview = signal<ReviewModel | null>(null);
   createSelectedReview = signal(false);
 
   reviews = toSignal(this.reviewService.reviews$, { initialValue: [] });
+  users = toSignal(this.userService.getUsers(), { initialValue: [] });
+  books = toSignal(this.bookService.fetchBooks(), { initialValue: [] });
 
   createForm = this.fb.nonNullable.group({
     bookId: ['', Validators.required],
@@ -43,6 +49,7 @@ export class ReviewDashboardComponent {
 
   constructor() {
     this.reviewService.getReviews().subscribe();
+    this.userService.getUsers().subscribe();
   }
 
   onDeleteReview(reviewId: string) {
@@ -62,6 +69,7 @@ export class ReviewDashboardComponent {
   }
 
   displaySelectedReview(review: ReviewModel) {
+    console.log(review._id);
     this.selectedReview.set({ ...review });
     this.editForm.patchValue({
       ...review,

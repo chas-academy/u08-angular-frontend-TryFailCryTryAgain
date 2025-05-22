@@ -56,12 +56,34 @@
                 <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
                     <div class="form-group">
                         <label for="edit-bookId">Book ID</label>
-                        <input type="text" id="edit-bookId" formControlName="bookId" required>
+                        <select id="edit-bookId" formControlName="bookId" required>
+                            <option [value]="selectedReview()?.bookId" selected>
+                                {{ selectedReview()?.bookId }}
+                            </option>
+                            @for (book of books(); track book._id) {
+                                @if (book._id !== selectedReview()?.bookId) {
+                                    <option [value]="book._id">
+                                        {{ book.title }} ({{ book._id }})
+                                    </option>
+                                }
+                            }
+                        </select>
                     </div>
 
                     <div class="form-group">
                         <label for="edit-userId">User ID</label>
-                        <input type="text" id="edit-userId" formControlName="userId" required>
+                        <select id="edit-userId" formControlName="userId" required>
+                            <option [value]="selectedReview()?.userId" selected>
+                                {{ selectedReview()?.userId }}
+                            </option>
+                            @for (user of users(); track user._id) {
+                                @if (user._id !== selectedReview()?.userId) {
+                                    <option [value]="user._id">
+                                        {{ user.first_name}} {{ user.last_name }} ({{ user.email }})
+                                    </option>
+                                }
+                            }
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -95,12 +117,31 @@
                 <form [formGroup]="createForm" (ngSubmit)="onCreateSubmit()">
                     <div class="form-group">
                         <label for="create-bookId">Book ID</label>
-                        <input type="text" id="create-bookId" formControlName="bookId" required>
+                        <select id="create-bookId" formControlName="bookId" required>
+                            <option [value]="" selected>
+                                Select a book
+                            </option>
+                            @for (book of books(); track book._id) {
+                                <option [value]="book._id">
+                                    {{ book.title }} ({{ book._id }})
+                                </option>
+                            }
+                        </select>
                     </div>
+                    
 
                     <div class="form-group">
                         <label for="create-userId">User ID</label>
-                        <input type="text" id="create-userId" formControlName="userId" required>
+                        <select id="create-userId" formControlName="userId" required>
+                            <option [value]="" selected>
+                                Select a User
+                            </option>
+                            @for (user of users(); track user._id) {
+                                <option [value]="user._id">
+                                    {{ user.first_name}} {{ user.last_name }} ({{ user.email }})
+                                </option>
+                            }
+                        </select>
                     </div>
 
                     <div class="form-group">

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ReviewModel } from './review-model';
+import { UserModel } from './user-model';
+import { BookModel } from './book-model';
 import { tap, shareReplay } from 'rxjs/operators';
 
 @Injectable({
@@ -9,11 +11,18 @@ import { tap, shareReplay } from 'rxjs/operators';
 })
 export class ReviewService {
   private reviewsUrl = 'https://restful-api-sca9.onrender.com/review/';
+  private userUrl = 'https://restful-api-sca9.onrender.com/user/';
+  private booksUrl = 'https://restful-api-sca9.onrender.com/book/';
   private deleteReviewUrl = 'https://restful-api-sca9.onrender.com/review/';
   private reviewsSubject = new BehaviorSubject<ReviewModel[]>([]);
+  private usersSubject = new BehaviorSubject<UserModel[]>([]);
+  private booksSubject = new BehaviorSubject<BookModel[]>([]);
   private readonly cacheKey = 'cachedReviews';
 
   reviews$ = this.reviewsSubject.asObservable();
+  users$ = this.usersSubject.asObservable();
+  books$ = this.booksSubject.asObservable();
+
 
   constructor(private http: HttpClient) {
     this.loadInitialData();
